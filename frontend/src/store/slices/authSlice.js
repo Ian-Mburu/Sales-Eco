@@ -1,5 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+
+// Login component 
+
 const initialState = {
   user: null,
   token: null,
@@ -26,3 +29,6 @@ const authSlice = createSlice({
 
 export const { setCredentials, logout } = authSlice.actions;
 export default authSlice.reducer;
+
+
+// ProductList component

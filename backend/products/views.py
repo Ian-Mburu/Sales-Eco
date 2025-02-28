@@ -54,21 +54,19 @@ class CategoryListView(generics.ListAPIView):
     def get_queryset(self):
         category_slug = self.kwargs['category_slug']
         category = products_models.Category.objects.get(slug=category_slug)
-        return products_models.Products.objects.filter(category=category)
+        return products_models.Product.objects.filter(category=category)
 
 class ProductsListView(generics.ListAPIView):
-    pagination_class = PageNumberPagination
-    page_size = 20
+    # pagination_class = PageNumberPagination
+    # page_size = 20
     serializer_class = products_serializer.ProductSerializer
     permission_classes = [AllowAny,]
+    queryset = products_models.Product.objects.all()
 
-    def get_queryset(self):
-        return products_models.Products.objects.all()
+
     
     def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context['request'] = self.request
-        return context
+        return {'request': self.request}
     
 class ProductsDetailView(generics.RetrieveAPIView):
     serializer_class = products_serializer.ProductSerializer
@@ -77,11 +75,11 @@ class ProductsDetailView(generics.RetrieveAPIView):
     def get_object(self):
         slug = self.kwargs['slug']
         try:
-            products = products_models.Products.objects.get(slug=slug)
-            products.view += 1
+            products = products_models.Product.objects.get(slug=slug)
+            products.views += 1
             products.save()
             return products
-        except products_models.Products.DoesNotExist:
+        except products_models.Product.DoesNotExist:
             raise Http404('product not found')
 
 class LikeProductAPIView(APIView):
@@ -89,7 +87,7 @@ class LikeProductAPIView(APIView):
     
     def post(self, request):
         try:
-            products = products_models.Products.objects.get(id=request.data.get('product_id'))
+            products = products_models.Product.objects.get(id=request.data.get('product_id'))
             user = request.user
             if products.likes.filter(id=user.id).exists():
                 products.likes.remove(user)
@@ -104,7 +102,7 @@ class LikeProductAPIView(APIView):
                     "likes_count": products.likes.count()
                 }, status=status.HTTP_200_OK)
     
-        except products_models.Products.DoesNotExist:
+        except products_models.Product.DoesNotExist:
             return Response({"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND)
         
 class CartListView(generics.ListAPIView):
@@ -120,7 +118,7 @@ class AddToCartView(APIView):
     def post(self, request):
         product_id = request.data.get('product_id')
         quantity = request.data.get('quantity', 1)
-        product = get_object_or_404(products_models.Products, id=product_id)
+        product = get_object_or_404(products_models.Product, id=product_id)
         
         cart_item, created = products_models.Cart.objects.get_or_create(
             user=request.user, product=product,

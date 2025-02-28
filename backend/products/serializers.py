@@ -62,14 +62,15 @@ class CategorySerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     likes_count = serializers.SerializerMethodField()
     has_liked = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField() 
 
     class Meta:
-        model = products_models.Products
-        fields = ('id', 'user', 'profile', 'category',
-                    'title', 'image', 'description', 
+        model = products_models.Product
+        fields = ['id', 'title', 'image', 'description', 
                     'price', 'likes', 'quantity', 
                     'slug', 'date', 'likes_count', 
-                    'has_liked')
+                    'has_liked']
+        depth = 1
         
     def get_likes_count(self, obj):
         return obj.likes.count()
@@ -80,17 +81,11 @@ class ProductSerializer(serializers.ModelSerializer):
             return obj.likes.filter(id=request.user.id).exists()
         return False
     
-    class Meta:
-        model = products_models.Products
-        fields = ('__all__')
-
-    def __init__(self, *args, **kwargs):
-        super(ProductSerializer, self).__init__(*args, **kwargs)
+    def get_image(self, product):
         request = self.context.get('request')
-        if request and request.method == 'POST':
-            self.Meta.depth = 0
-        else:
-            self.Meta.depth = 1
+        if product.image:
+            return request.build_absolute_uri(product.image.url)
+        return None
 
 class CartSerializer(serializers.ModelSerializer):
     class Meta:

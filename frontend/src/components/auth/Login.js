@@ -14,7 +14,7 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await API.post('/auth/login/', { email, password });
-      const { access, refresh } = response.data;
+      const { access } = response.data;
       localStorage.setItem('token', access);
       dispatch(setCredentials({ user: { email }, token: access }));
       navigate('/');

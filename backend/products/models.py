@@ -84,7 +84,7 @@ class Category(models.Model):
         super(Category, self).save(*args, **kwargs)
         
 
-class Products(models.Model):
+class Product(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
@@ -108,11 +108,11 @@ class Products(models.Model):
         if self.slug == '' or self.slug is None:
             self.slug = slugify(self.title)
 
-        super(Products, self).save(*args, **kwargs)
+        super(Product, self).save(*args, **kwargs)
 
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    product = models.ForeignKey(Products, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     date = models.DateTimeField(auto_now_add=True)
 
@@ -129,7 +129,7 @@ class Order(models.Model):
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    product = models.ForeignKey(Products, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
@@ -141,7 +141,7 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    product = models.ForeignKey(Products, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -173,7 +173,7 @@ class Payment(models.Model):
 
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    product = models.ForeignKey(Products, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     comment = models.TextField(blank=True, null=True)
     rating = models.PositiveIntegerField()
     date = models.DateTimeField(auto_now_add=True)
@@ -184,7 +184,7 @@ class Review(models.Model):
 
 class Wishlist(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    product = models.ForeignKey(Products, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
