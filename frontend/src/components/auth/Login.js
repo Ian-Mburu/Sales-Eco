@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { setCredentials } from '../../store/slices/authSlice';
+import { setCredentials } from '../../slices/authSlice';
 import API from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 
@@ -14,14 +14,18 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await API.post('/auth/login/', { email, password });
-      const { access } = response.data;
+      const { access, refresh } = response.data;
+      
       localStorage.setItem('token', access);
+      localStorage.setItem('refresh_token', refresh);
+      
       dispatch(setCredentials({ user: { email }, token: access }));
-      navigate('/');
+      navigate('/cart');
     } catch (error) {
       console.error('Login failed:', error);
     }
   };
+  
 
   return (
     <form onSubmit={handleSubmit}>

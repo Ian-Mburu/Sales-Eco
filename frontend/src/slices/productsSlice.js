@@ -1,10 +1,10 @@
 // src/features/productsSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { fetchProducts, fetchProductDetail } from '../../services/productService';
+import { fetchProducts, fetchProductDetail } from '../services/productService';
 
 const initialState = {
   products: [],
-  product: null,
+  product: null,  
   status: 'idle',
   error: null,
 };
@@ -12,9 +12,7 @@ const initialState = {
 export const getProducts = createAsyncThunk(
   'products/fetchAll',
   async () => {
-    const response = await fetchProducts();
-    console.log('API Response:', response); 
-    return response.data;
+    return fetchProducts();
   }
 );
 
@@ -23,9 +21,10 @@ export const getProductDetail = createAsyncThunk(
   'products/fetchDetail',
   async (slug) => {
     const response = await fetchProductDetail(slug);
-    return response.data;
+    return response;
   }
 );
+
 
 const productsSlice = createSlice({
   name: 'products',
@@ -38,7 +37,7 @@ const productsSlice = createSlice({
       })
       .addCase(getProducts.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.products = action.payload;
+        state.products = action.payload || [];
       })
       .addCase(getProducts.rejected, (state, action) => { // Add error case
         state.status = 'failed';

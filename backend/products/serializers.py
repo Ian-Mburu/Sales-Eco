@@ -47,9 +47,16 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('__all__')
 
 class ProfileSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username')
+    email = serializers.EmailField(source='user.email')
+    full_name = serializers.CharField(source='user.full_name')
+
     class Meta:
         model = products_models.Profile
-        fields = ('__all__')
+        fields = [
+            'username', 'email', 'full_name', 'image', 
+            'bio', 'county', 'facebook', 'twitter', 'date'
+        ]
 
 class CategorySerializer(serializers.ModelSerializer):
     def get_post_count(self, category):
@@ -57,7 +64,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = products_models.Category
-        fields = ('id', 'name', 'slug', 'post_count')
+        fields = ('id', 'name', 'slug',)
 
 class ProductSerializer(serializers.ModelSerializer):
     likes_count = serializers.SerializerMethodField()
@@ -88,9 +95,10 @@ class ProductSerializer(serializers.ModelSerializer):
         return None
 
 class CartSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = products_models.Cart
-        fields = ('__all__')
+        fields = ['id', 'product', 'quantity', 'total_price']
     
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:

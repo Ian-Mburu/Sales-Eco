@@ -1,18 +1,29 @@
 // src/components/Products/ProductDetail.js
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchProductDetail } from '../../services/api';
+import { getProductDetail } from '../../slices/productsSlice';
+import axios from 'axios';
 // import AddToCart from '../Cart/AddToCart';
 
 const ProductDetail = () => {
   const { slug } = useParams();
   const dispatch = useDispatch();
+  const [quantity] = useState(1);
   const { product} = useSelector((state) => state.products);
 
   useEffect(() => {
-    dispatch(fetchProductDetail(slug));
+    dispatch(getProductDetail(slug));
   }, [dispatch, slug]);
+
+  const addToCart = async () => {
+    try {
+        await axios.post('/api/cart/add/', { product_id: product.id, quantity });
+        alert('Product added to cart!');
+    } catch (error) {
+        console.error('Error adding to cart:', error);
+    }
+};
 
   return (
     <div className="product-detail">
@@ -22,7 +33,7 @@ const ProductDetail = () => {
           <img src={product.image} alt={product.title} />
           <p>{product.description}</p>
           <p>Price: ${product.price}</p>
-          {/* <AddToCart product={product} /> */}
+          <button onClick={addToCart}>Add to Cart</button>
         </>
       )}
     </div>

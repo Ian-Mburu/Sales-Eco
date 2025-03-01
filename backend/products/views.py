@@ -31,13 +31,21 @@ class RegisterView(generics.CreateAPIView):
     serializer_class = products_serializer.RegisterSerializer
     permission_classes = [AllowAny,]
 
+    def create(self, request, *args, **kwargs):
+        print("Received Data:", request.data)  # Debugging
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response({"message": "User registered successfully"}, status=status.HTTP_201_CREATED)
+        print("Errors:", serializer.errors)  # Debugging
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 class ProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = products_serializer.ProfileSerializer
     permission_classes = (IsAuthenticated,)
 
     def get_object(self):
-        def get_object(self):
-            return self.request.user.profile
+        return self.request.user.profile
 
     
 class CategoryView(generics.ListAPIView):
@@ -48,7 +56,7 @@ class CategoryView(generics.ListAPIView):
         return products_models.Category.objects.all()
     
 class CategoryListView(generics.ListAPIView):
-    serializer_class = products_serializer.CategorySerializer
+    serializer_class = products_serializer.ProductSerializer
     permission_classes = [AllowAny,]
 
     def get_queryset(self):
@@ -107,29 +115,36 @@ class LikeProductAPIView(APIView):
         
 class CartListView(generics.ListAPIView):
     serializer_class = products_serializer.CartSerializer
-    permission_classes = [AllowAny,]
+    permission_classes = [IsAuthenticated,]
 
     def get_queryset(self):
-        return products_models.Cart.objects.filter(user=self.request.user)
+        user = self.request.user
+        print(f"Current user: {user}")  # Debugging: Check if the user is recognized
+        return products_models.Cart.objects.filter(user=user)
     
 class AddToCartView(APIView):
-    permission_classes = [AllowAny,]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        user = request.user
+        print(f"Adding to cart for user: {user}")  # Debugging
+
         product_id = request.data.get('product_id')
         quantity = request.data.get('quantity', 1)
         product = get_object_or_404(products_models.Product, id=product_id)
-        
+
         cart_item, created = products_models.Cart.objects.get_or_create(
-            user=request.user, product=product,
-            defaults={'quantity': quantity}
+            user=user, product=product,
+            defaults={'quantity': quantity, 'total_price': product.price * int(quantity)}
         )
-        
+
         if not created:
             cart_item.quantity += int(quantity)
+            cart_item.total_price = cart_item.quantity * product.price
             cart_item.save()
-        
+
         return Response(products_serializer.CartSerializer(cart_item).data, status=status.HTTP_201_CREATED)
+
     
 class UpdateCartView(APIView):
     permission_classes = [AllowAny,]
