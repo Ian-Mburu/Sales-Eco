@@ -188,14 +188,14 @@ class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 class OrderItemListView(generics.ListCreateAPIView):
     serializer_class = products_serializer.OrderItemSerializer
-    permission_classes = [AllowAny,]
+    permission_classes = [IsAuthenticated,]
 
     def get_queryset(self):
         return products_models.OrderItem.objects.filter(order__user=self.request.user)
 
 class OrderItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = products_serializer.OrderItemSerializer
-    permission_classes = [AllowAny,]
+    permission_classes = [IsAuthenticated,]
 
     def get_object(self):
         try:
@@ -206,14 +206,14 @@ class OrderItemDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 class PaymentListView(generics.ListCreateAPIView):
     serializer_class = products_serializer.PaymentSerializer
-    permission_classes = [AllowAny,]
+    permission_classes = [IsAuthenticated,]
 
     def get_queryset(self):
         return products_models.Payment.objects.filter(user=self.request.user)
 
 class PaymentDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = products_serializer.PaymentSerializer
-    permission_classes = [AllowAny,]
+    permission_classes = [IsAuthenticated,]
 
     def get_object(self):
         try:
@@ -224,10 +224,11 @@ class PaymentDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 class ReviewListView(generics.ListCreateAPIView):
     serializer_class = products_serializer.ReviewSerializer
-    permission_classes = [AllowAny,]
+    permission_classes = [IsAuthenticated]  # Changed from AllowAny
+    queryset = products_models.Review.objects.all()
 
-    def get_queryset(self):
-        return products_models.Review.objects.all()
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = products_serializer.ReviewSerializer
@@ -242,10 +243,14 @@ class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
 # Wishlist Views
 class WishlistListView(generics.ListCreateAPIView):
     serializer_class = products_serializer.WishlistSerializer
-    permission_classes = [AllowAny,]
+    permission_classes = [IsAuthenticated] 
+    pagination_class = PageNumberPagination
 
     def get_queryset(self):
         return products_models.Wishlist.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 class WishlistDetailView(generics.DestroyAPIView):
     serializer_class = products_serializer.WishlistSerializer
@@ -260,14 +265,14 @@ class WishlistDetailView(generics.DestroyAPIView):
 # Contact Views
 class ContactListView(generics.ListCreateAPIView):
     serializer_class = products_serializer.ContactSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return products_models.Contact.objects.all()
 
 class ContactDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = products_serializer.ContactSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated,]
 
     def get_object(self):
         try:

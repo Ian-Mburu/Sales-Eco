@@ -116,14 +116,28 @@ class PaymentSerializer(serializers.ModelSerializer):
         fields = ('__all__')
 
 class ReviewSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField(read_only=True)
+    
     class Meta:
         model = products_models.Review
-        fields = ('__all__')
+        fields = ['id', 'user', 'product', 'rating', 'comment', 'date']
+        extra_kwargs = {
+            'product': {'required': True},
+            'rating': {'required': True}
+        }
+
+    def validate_rating(self, value):
+        if value < 1 or value > 5:
+            raise serializers.ValidationError("Rating must be between 1 and 5")
+        return value
+
 
 class WishlistSerializer(serializers.ModelSerializer):
     class Meta:
         model = products_models.Wishlist
-        fields = ('__all__')
+        fields = ['id', 'user', 'product', 'date']
+        read_only_fields = ['user', 'date']
+        depth = 1
 
 class ContactSerializer(serializers.ModelSerializer):
     class Meta:
