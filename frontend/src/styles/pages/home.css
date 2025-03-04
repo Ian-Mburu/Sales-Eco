@@ -1,0 +1,99 @@
+.home {
+    display: flex;
+    flex-direction: column;  /* Stack children vertically */
+    align-items: center;  /* Center content */
+}
+
+.back-g {
+    display: flex;
+    flex-direction: row;
+    gap: 80px;
+    align-items: center;
+    margin: 90px 0 00px 0px;
+    justify-content: center;
+}
+
+.home-1mage1 {
+    width: 600px; 
+    height: 400px;
+    object-fit: cover;
+    margin: -0px 0 10px -00px;
+    border-radius: 20px;
+}
+
+.p-1 {
+    font-size: 30px;
+    font-family: cursive;
+    font-weight: bold;
+    color: #da6363;
+}
+
+.b-image {
+    
+        background-image: url('../../images/shoe4.jpg');
+        background-size: cover; 
+        background-position: center;
+        background-repeat: no-repeat;
+        width: 98.9vw; 
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+}
+
+.p-2 {
+    font-size: 35px;
+    font-family: sans-serif;
+    font-weight: bold;
+    color: #fcfcfc;
+}
+
+.btn-prd {
+    padding: 15px 30px;
+    width: 15%;
+    cursor: pointer;
+    border: none;
+    background: #000;
+    border-radius: 5px;
+}
+
+.link-prd {
+    text-decoration: none;
+    font-size: 16px;
+    font-family: sans-serif;
+    font-weight: bold;
+    color: #da5b5b;
+}
+
+.btn-prd:hover {
+    background: #ffffff;
+}
+
+.b-content {
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+}
+
+.icon-del {
+    margin: 30px 0 0 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    padding: 5px;
+    width: 250px;
+    border: 1px solid #fcfcfc;
+}
+
+.icon-h {
+    width: 50px;
+    height: 52px;
+    color: #ffffffad;
+}
+
+.p-3 {
+    font-size: 16px;
+    font-family: sans-serif;
+    font-weight: lighter;
+    color: #fcfcfc;
+}
