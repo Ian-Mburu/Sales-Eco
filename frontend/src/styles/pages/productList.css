@@ -1,0 +1,116 @@
+.prd-list {
+    display: grid;
+    grid-template-columns: repeat(3, 0.1fr);
+    gap: 90px;
+    align-items: center;    
+    justify-content: center;
+    margin: 100px 0 0px 0;
+}
+
+.prd-list2 {
+    border: none;
+    border-radius: 25px;
+    width: 270px;
+    height: 360px;
+    background: #f57f7f54;
+}
+
+.block {
+    text-decoration: none;
+}
+
+.likes {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+}
+
+.like-icon {
+    cursor: pointer;
+}
+
+.like-icon:hover {
+    color: #d31616;
+}
+
+.prd-image {
+    width: 250px;
+    height: auto;
+    padding: 20px;
+}
+
+.title-price-div {
+    display:  flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    padding: 5px;
+
+}
+
+.title-prd {
+    font-size: 20px;
+    font-family: sans-serif;
+    font-weight: bold;
+    color: #d31616;
+}
+
+.price-prd {
+    font-size: 14px;
+    font-family: sans-serif;
+    font-weight: lighter;
+    color: #d31616;
+}
+
+.date-prd {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 30px;
+    padding: 5px;
+}
+
+.seller-info {
+    display: flex;
+    align-items: center;
+    gap: 150px;
+    padding: 5px;
+}
+  
+.seller-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+  
+.seller-link {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+}
+
+p {
+   text-decoration: none; 
+}
+  
+.seller-link:hover {
+    color: #d31616;
+}
+
+.add-cart:hover {
+    color: #d31616;
+}
+  
+.date-posted {
+    font-size: 12px;
+    color: rgb(252, 13, 13);
+}
+
+.prd-3 {
+    margin: -20px 0 0 0;
+}

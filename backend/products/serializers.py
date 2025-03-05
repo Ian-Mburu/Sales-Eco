@@ -69,15 +69,18 @@ class CategorySerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     likes_count = serializers.SerializerMethodField()
     has_liked = serializers.SerializerMethodField()
-    image = serializers.SerializerMethodField() 
+    image = serializers.SerializerMethodField()
+    seller = ProfileSerializer(source='profile', read_only=True)  # Include seller profile
+    date_posted = serializers.DateTimeField(format="%Y-%m-%d %H:%M", source='date')  # Format date
 
     class Meta:
         model = products_models.Product
         fields = ['id', 'title', 'image', 'description', 
-                    'price', 'likes', 'quantity', 
-                    'slug', 'date', 'likes_count', 
-                    'has_liked']
+                  'price', 'likes', 'quantity', 
+                  'slug', 'date_posted', 'likes_count', 
+                  'has_liked', 'seller']
         depth = 1
+
         
     def get_likes_count(self, obj):
         return obj.likes.count()

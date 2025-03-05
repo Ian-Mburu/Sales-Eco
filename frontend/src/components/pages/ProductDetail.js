@@ -33,6 +33,7 @@ const ProductDetail = () => {
           <img src={product.image} alt={product.title} />
           <p>{product.description}</p>
           <p>Price: ${product.price}</p>
+          <p className="date-posted">Posted on: {product.date_posted}</p>
           <button onClick={addToCart}>Add to Cart</button>
         </>
       )}

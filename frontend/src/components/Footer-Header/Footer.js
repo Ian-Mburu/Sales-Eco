@@ -9,7 +9,7 @@ const Footer = () => {
   return (
     <footer className="footer">
       <div className="footer-container">
-        {/* Help Section */}
+       
         <div className="footer-section">
           <h3>NEED HELP?</h3>
           <ul>
@@ -19,7 +19,6 @@ const Footer = () => {
           </ul>
         </div>
 
-        {/* Useful Links */}
         <div className="footer-section">
           <h3>USEFUL LINKS</h3>
           <ul>
@@ -33,9 +32,8 @@ const Footer = () => {
           </ul>
         </div>
 
-        {/* About Jumia */}
         <div className="footer-section">
-          <h3>ABOUT JUMIA</h3>
+          <h3>ABOUT Eco-Sales</h3>
           <ul>
             <li><a href="#">About us</a></li>
             <li><a href="#">Returns and Refunds Policy</a></li>
