@@ -78,7 +78,7 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'image', 'description', 
                   'price', 'likes', 'quantity', 
                   'slug', 'date_posted', 'likes_count', 
-                  'has_liked', 'seller']
+                  'has_liked', 'views', 'seller']
         depth = 1
 
         

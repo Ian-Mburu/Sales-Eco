@@ -12,7 +12,15 @@
     border-radius: 25px;
     width: 270px;
     height: 360px;
-    background: #f57f7f54;
+    background: #000000bd;
+}
+
+.seller-username {
+    color: #000;
+}
+
+.seller-username:hover {
+    color: #d31616;
 }
 
 .block {
@@ -44,15 +52,19 @@
     display:  flex;
     flex-direction: row;
     align-items: center;
-    gap: 20px;
+    justify-content: center;
+    gap: 10px;
     padding: 5px;
-
 }
 
 .title-prd {
     font-size: 20px;
     font-family: sans-serif;
     font-weight: bold;
+    color: #ffffff;
+}
+
+.title-prd:hover {
     color: #d31616;
 }
 
@@ -60,14 +72,14 @@
     font-size: 14px;
     font-family: sans-serif;
     font-weight: lighter;
-    color: #d31616;
+    color: #b1a8a8;
 }
 
 .date-prd {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 30px;
+    gap: 210px;
     padding: 5px;
 }
 
@@ -92,6 +104,22 @@
     text-decoration: none;
     color: #333;
     font-weight: bold;
+}
+
+.wishlist-icon {
+    color: #000;
+}
+
+.wishlist-icon:hover {
+    color: #d31616;
+}
+
+.cart-icon {
+    color: #000;
+}
+
+.cart-icon:hover {
+    color: #d31616;
 }
 
 p {

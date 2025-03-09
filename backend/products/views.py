@@ -64,12 +64,18 @@ class CategoryListView(generics.ListAPIView):
         category = products_models.Category.objects.get(slug=category_slug)
         return products_models.Product.objects.filter(category=category)
 
+
+class ProductPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
 class ProductsListView(generics.ListAPIView):
     # pagination_class = PageNumberPagination
     # page_size = 20
     serializer_class = products_serializer.ProductSerializer
     permission_classes = [AllowAny,]
     queryset = products_models.Product.objects.all()
+    pagination_class = ProductPagination
 
 
     

@@ -1,11 +1,14 @@
 // src/features/productsSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { fetchProducts, fetchProductDetail } from '../services/productService';
+import axios from 'axios';
 
 const initialState = {
   products: [],
   product: null,  
-  status: 'idle',
+  productsStatus: 'idle',
+  productStatus: 'idle',
+  cartStatus: 'idle', 
   error: null,
 };
 
@@ -16,15 +19,24 @@ export const getProducts = createAsyncThunk(
   }
 );
 
-
 export const getProductDetail = createAsyncThunk(
   'products/fetchDetail',
   async (slug) => {
-    const response = await fetchProductDetail(slug);
-    return response;
+    return fetchProductDetail(slug);
   }
 );
 
+export const addToCart = createAsyncThunk(
+  'cart/add',
+  async (productId, { rejectWithValue }) => {
+    try {
+      const response = await axios.post('/api/cart/add/', { product_id: productId });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Failed to add to cart');
+    }
+  }
+);
 
 const productsSlice = createSlice({
   name: 'products',
@@ -37,7 +49,7 @@ const productsSlice = createSlice({
       })
       .addCase(getProducts.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.products = action.payload || [];
+        state.products = action.payload.results || [];
       })
       .addCase(getProducts.rejected, (state, action) => { // Add error case
         state.status = 'failed';
