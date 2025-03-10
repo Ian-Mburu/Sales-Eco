@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { submitContact } from '../../slices/ContactSlice';
+import Footer from '../Footer-Header/Footer';
+import Header from '../Footer-Header/Header';
+import '../../styles/pages/contact.css';
 
 const ContactForm = () => {
   const dispatch = useDispatch();
@@ -19,50 +22,55 @@ const ContactForm = () => {
   };
 
   return (
-    <div className="max-w-lg mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Contact Us</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          placeholder="Name"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          className="w-full p-2 border rounded"
-          required
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          className="w-full p-2 border rounded"
-          required
-        />
-        <input
-          type="text"
-          placeholder="Subject"
-          value={formData.subject}
-          onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-          className="w-full p-2 border rounded"
-          required
-        />
-        <textarea
-          placeholder="Message"
-          value={formData.message}
-          onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-          className="w-full p-2 border rounded h-32"
-          required
-        />
-        <button
-          type="submit"
-          disabled={status === 'loading'}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
-        >
-          {status === 'loading' ? 'Sending...' : 'Send Message'}
-        </button>
-        {error && <p className="text-red-500">{error}</p>}
-      </form>
-    </div>
+    <>
+      <Header />
+      <div className="contact-container">
+        <h2 className="contact-title">Get in Touch</h2>
+        <p className="contact-description">We would love to hear from you. Fill out the form below and we will get back to you as soon as possible.</p>
+        <form onSubmit={handleSubmit} className="contact-form">
+          <input
+            type="text"
+            placeholder="Your Name"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            className="contact-input"
+            required
+          />
+          <input
+            type="email"
+            placeholder="Your Email"
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            className="contact-input"
+            required
+          />
+          <input
+            type="text"
+            placeholder="Subject"
+            value={formData.subject}
+            onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+            className="contact-input"
+            required
+          />
+          <textarea
+            placeholder="Your Message"
+            value={formData.message}
+            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+            className="contact-textarea"
+            required
+          />
+          <button
+            type="submit"
+            disabled={status === 'loading'}
+            className="contact-submit"
+          >
+            {status === 'loading' ? 'Sending...' : 'Send Message'}
+          </button>
+          {error && <p className="contact-error">{error}</p>}
+        </form>
+      </div>
+      <Footer />
+    </>
   );
 };
 

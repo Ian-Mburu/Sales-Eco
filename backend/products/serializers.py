@@ -59,12 +59,14 @@ class ProfileSerializer(serializers.ModelSerializer):
         ]
 
 class CategorySerializer(serializers.ModelSerializer):
+    post_count = serializers.SerializerMethodField()
+
     def get_post_count(self, category):
         return category.products.count()
 
     class Meta:
         model = products_models.Category
-        fields = ('id', 'name', 'slug',)
+        fields = ('id', 'name', 'slug', 'post_count')
 
 class ProductSerializer(serializers.ModelSerializer):
     likes_count = serializers.SerializerMethodField()

@@ -87,7 +87,7 @@ class Category(models.Model):
 class Product(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
     title = models.CharField(max_length=255)
     image = models.ImageField(upload_to='image', null=True, blank=True)
     description = models.TextField(null=True, blank=True)
