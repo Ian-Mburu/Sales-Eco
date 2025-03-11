@@ -5,7 +5,7 @@ import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import ProductList from './components/pages/ProductList';
 import ProductDetail from './components/pages/ProductDetail';
-import Cart from './components/pages/Cart';
+import Cart from './components/pages/CartList';
 import Profile from './components/auth/Profile';
 import CategoriesList from './components/pages/CategoriesList';
 import CategoryProducts from './components/pages/CategoryProducts';
@@ -30,11 +30,11 @@ const App = () => {
         <Route path="/products/:slug" element={<ProductDetail />} />
         <Route path="/categories" element={<CategoriesList />} />
         <Route path="/categories/:categorySlug" element={<CategoryProducts />} />        
-        <Route path="/cart" element={
-          <ProtectedRoute>
-            <Cart />
-          </ProtectedRoute>
-        } />
+          <Route path="/cart" element={
+            <ProtectedRoute>
+              <Cart />
+            </ProtectedRoute>
+          } />
         <Route path="/orders" element={<OrderList />} />
         <Route path="/orders/:id" element={<OrderDetail />} />
         <Route path="/payments" element={<PaymentList />} />

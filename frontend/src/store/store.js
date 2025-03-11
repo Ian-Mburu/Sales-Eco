@@ -8,6 +8,7 @@ import PaymentReducer from '../slices/PaymentSlice'
 import ReviewReducer from '../slices/ReviewSlice'
 import WishlistReducer from '../slices/WishlistSlice'
 import ContactReducer from '../slices/ContactSlice'
+import CartReducer from '../slices/CartSlice'
 
 
 
@@ -22,5 +23,6 @@ export const store = configureStore({
     reviews: ReviewReducer,
     wishlist: WishlistReducer,
     contact: ContactReducer,
+    cart: CartReducer,
   },
 });

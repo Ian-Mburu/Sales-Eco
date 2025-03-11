@@ -100,10 +100,20 @@ class ProductSerializer(serializers.ModelSerializer):
         return None
 
 class CartSerializer(serializers.ModelSerializer):
-    
+    product = ProductSerializer(read_only=True)  # Add nested product serializer
+    product_image = serializers.SerializerMethodField()
+    total_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+
     class Meta:
         model = products_models.Cart
-        fields = ['id', 'product', 'quantity', 'total_price']
+        fields = ['id', 'product', 'product_image', 'quantity', 'total_price']
+
+    def get_product_image(self, obj):
+        request = self.context.get('request')
+        if obj.product.image:
+            return request.build_absolute_uri(obj.product.image.url)
+        return None
+
     
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:

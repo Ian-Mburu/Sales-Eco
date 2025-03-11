@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchPayments } from '../../slices/PaymentSlice';
+import Header from '../Footer-Header/Header';
+import Footer from '../Footer-Header/Footer';
 
 const PaymentList = () => {
   const dispatch = useDispatch();
@@ -15,6 +17,8 @@ const PaymentList = () => {
   if (!payments.length) return <div>No payment history found</div>;
 
   return (
+    <>
+    <Header />
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Payment History</h1>
       <div className="space-y-4">
@@ -40,6 +44,8 @@ const PaymentList = () => {
         ))}
       </div>
     </div>
+    <Footer />
+    </>
   );
 };
 

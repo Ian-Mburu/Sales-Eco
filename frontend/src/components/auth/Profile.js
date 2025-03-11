@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { getUserProfile } from '../../slices/profileSlice';
+import Header from '../Footer-Header/Header';
+import Footer from '../Footer-Header/Footer';
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -14,6 +16,8 @@ const Profile = () => {
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
 
   return (
+    <>
+    <Header />
     <div className="max-w-2xl mx-auto p-4">
       {profile && (
         <div className="bg-white shadow-md rounded-lg p-6">
@@ -32,6 +36,8 @@ const Profile = () => {
         </div>
       )}
     </div>
+    <Footer />
+    </>
   );
 };
 

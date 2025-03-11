@@ -128,8 +128,11 @@ class CartListView(generics.ListAPIView):
         print(f"Current user: {user}")  # Debugging: Check if the user is recognized
         return products_models.Cart.objects.filter(user=user)
     
+    def get_serializer_context(self):
+        return{'request': self.request}
+    
 class AddToCartView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated,]
 
     def post(self, request):
         user = request.user
@@ -153,7 +156,7 @@ class AddToCartView(APIView):
 
     
 class UpdateCartView(APIView):
-    permission_classes = [AllowAny,]
+    permission_classes = [IsAuthenticated,]
 
     def put(self, request, cart_id):
         cart_item = get_object_or_404(products_models.Cart, id=cart_id, user=request.user)
@@ -167,7 +170,7 @@ class UpdateCartView(APIView):
             return Response({"error": "Invalid quantity"}, status=status.HTTP_400_BAD_REQUEST)
 
 class RemoveFromCartView(APIView):
-    permission_classes = [AllowAny,]
+    permission_classes = [IsAuthenticated,]
 
     def delete(self, request, cart_id):
         cart_item = get_object_or_404(products_models.Cart, id=cart_id, user=request.user)
@@ -176,14 +179,14 @@ class RemoveFromCartView(APIView):
     
 class OrderListView(generics.ListCreateAPIView):
     serializer_class = products_serializer.OrderSerializer
-    permission_classes = [AllowAny,]
+    permission_classes = [IsAuthenticated,]
 
     def get_queryset(self):
         return products_models.Order.objects.filter(user=self.request.user)
 
 class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = products_serializer.OrderSerializer
-    permission_classes = [AllowAny,]
+    permission_classes = [IsAuthenticated,]
 
     def get_object(self):
         try:

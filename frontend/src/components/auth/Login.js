@@ -3,6 +3,9 @@ import { useDispatch } from 'react-redux';
 import { setCredentials } from '../../slices/authSlice';
 import API from '../../services/api';
 import { useNavigate } from 'react-router-dom';
+import Footer from '../Footer-Header/Footer';
+import Header from '../Footer-Header/Header';
+import '../../styles/auth/login.css'
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -28,7 +31,9 @@ const Login = () => {
   
 
   return (
-    <form onSubmit={handleSubmit}>
+    <>
+    <Header />
+    <form className='login-page' onSubmit={handleSubmit}>
       <input
         type="email"
         placeholder="Email"
@@ -43,6 +48,8 @@ const Login = () => {
       />
       <button type="submit">Login</button>
     </form>
+    <Footer />
+    </>
   );
 };
 
