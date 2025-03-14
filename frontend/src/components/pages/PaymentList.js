@@ -1,49 +1,125 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchPayments } from '../../slices/PaymentSlice';
-import Header from '../Footer-Header/Header';
-import Footer from '../Footer-Header/Footer';
+import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import PaymentService from '../../services/paymentService';
+import Header from '../Footer-Header/Header'
+import Footer from '../Footer-Header/Footer'
+import '../../styles/pages/paymentList.css';
 
 const PaymentList = () => {
-  const dispatch = useDispatch();
-  const { items: payments, status, error } = useSelector((state) => state.payments);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { totalAmount } = location.state || {};
+  const [paymentDetails, setPaymentDetails] = useState({
+    cardNumber: '',
+    expiry: '',
+    cvc: '',
+    name: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  useEffect(() => {
-    dispatch(fetchPayments());
-  }, [dispatch]);
-
-  if (status === 'loading') return <div>Loading payments...</div>;
-  if (error) return <div>Error: {error}</div>;
-  if (!payments.length) return <div>No payment history found</div>;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await PaymentService.processPayment({
+        amount: totalAmount,
+        paymentDetails
+      });
+      navigate('/payment-success');
+    } catch (err) {
+      setError('Payment failed. Please check your details and try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
     <Header />
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Payment History</h1>
-      <div className="space-y-4">
-        {payments.map(payment => (
-          <div key={payment.id} className="border rounded-lg p-4 shadow-sm">
-            <div className="flex justify-between items-center">
-              <div>
-                <h2 className="text-lg font-semibold">Payment #{payment.id}</h2>
-                <p className="text-gray-600">Amount: ${payment.amount}</p>
-                <p className="text-gray-600">Method: {payment.payment_method}</p>
-                <p className="text-gray-600">Date: {new Date(payment.timestamp).toLocaleDateString()}</p>
-              </div>
-              <span className={`px-2 py-1 rounded ${payment.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                {payment.status}
-              </span>
-            </div>
-            {payment.transaction_id && (
-              <div className="mt-2">
-                <p className="text-sm text-gray-500">Transaction ID: {payment.transaction_id}</p>
-              </div>
-            )}
+    <div className='payment-container'>
+      <h1 className="payment-title">Payment Checkout</h1>
+      {totalAmount ? (
+        <div className="payment-box">
+          <div className="payment-summary">
+            <h2 className="summary-title">Total Amount:</h2>
+            <p className="summary-amount">{totalAmount}</p>
           </div>
-        ))}
+
+          <form onSubmit={handleSubmit} className="payment-form">
+            <div className="input-group">
+              <label className="input-label">Card Number</label>
+              <input
+                type="text"
+                className="payment-input"
+                placeholder="4242 4242 4242 4242"
+                value={paymentDetails.cardNumber}
+                onChange={(e) => setPaymentDetails({...paymentDetails, cardNumber: e.target.value})}
+                required
+              />
+            </div>
+
+            <div className="input-row">
+              <div className="input-group">
+                <label className="input-label">Expiry Date</label>
+                <input
+                  type="date"
+                  className="payment-input"
+                  placeholder="MM/YY"
+                  value={paymentDetails.expiry}
+                  onChange={(e) => setPaymentDetails({...paymentDetails, expiry: e.target.value})}
+                  required
+                />
+              </div>
+              
+              <div className="input-group">
+                <label className="input-label">CVC</label>
+                <input
+                  type="text"
+                  className="payment-input"
+                  placeholder="123"
+                  value={paymentDetails.cvc}
+                  onChange={(e) => setPaymentDetails({...paymentDetails, cvc: e.target.value})}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="input-group">
+              <label className="input-label">Cardholder Name</label>
+              <input
+                type="text"
+                className="payment-input"
+                placeholder="John Doe"
+                value={paymentDetails.name}
+                onChange={(e) => setPaymentDetails({...paymentDetails, name: e.target.value})}
+                required
+              />
+            </div>
+
+            {error && <p className="payment-error">{error}</p>}
+
+            <button 
+              type="submit"
+              className="payment-button"
+              disabled={loading}
+            >
+              {loading ? 'Processing...' : 'Pay Now'}
+            </button>
+          </form>
+        </div>
+      ) : (
+        <div className="payment-error-box">
+          <p className="error-text">No payment amount specified</p>
+          <button 
+            onClick={() => navigate('/cart')}
+            className="return-button"
+          >
+            Return to Cart
+          </button>
+        </div>
+      )}
       </div>
-    </div>
     <Footer />
     </>
   );

@@ -1,55 +1,65 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchWishlist, removeFromWishlist } from '../../slices/WishlistSlice';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import '../../styles/pages/wishlist.css'
+import Header from '../Footer-Header/Header';
+import Footer from '../Footer-Header/Footer';
+
 
 const Wishlist = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { items, status, error } = useSelector((state) => state.wishlist);
   const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    if (user) {
+    if (!user) {
+      navigate('/login'); // Redirect to login if user is not authenticated
+    } else {
       dispatch(fetchWishlist());
     }
-  }, [dispatch, user]);
+  }, [dispatch, user, navigate]);
 
   const handleRemove = (itemId) => {
     dispatch(removeFromWishlist(itemId));
   };
 
+  if (!user) {
+    return null; // Prevents flickering before redirection
+  }
+
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">My Wishlist</h1>
+    <>
+    <Header />
+    <div className="wishlist-container">
+      <h1 className="wishlist-title">My Wishlist</h1>
       {status === 'loading' ? (
-        <div className="text-center py-8">Loading wishlist...</div>
+        <div className="wishlist-loading">Login to view your wishlist <a className='wishlist-login' href='/login'>Login</a> </div>
       ) : error ? (
-        <div className="text-red-500 text-center">{error}</div>
-      ) : items.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="wishlist-error">{error}</div>
+      ) : items.length > 0 ? ( 
+        <div className="wishlist-grid">
           {items.map((item) => {
-            const product = item.product; // Extract product from wishlist item
+            const product = item.product;
             return (
-              <div key={item.id} className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
-                <Link 
-                  to={`/products/${product.slug}`} 
-                  className="block mb-2"
-                >
+              <div key={item.id} className="wishlist-item">
+                <Link to={`/products/${product.slug}`} className="wishlist-link">
                   <img 
                     src={product.image || '/placeholder-product.jpg'} 
                     alt={product.title}
-                    className="w-full h-48 object-cover mb-2 rounded"
-                    onError={(e) => e.target.src = '/placeholder-product.jpg'}
+                    className="wishlist-image"
+                    onError={(e) => (e.target.src = '/placeholder-product.jpg')}
                   />
-                  <h3 className="font-semibold text-lg">{product.title}</h3>
-                  <p className="text-gray-600">${product.price}</p>
-                  <p className="text-sm text-gray-500">
+                  <h3 className="wishlist-product-title">{product.title}</h3>
+                  <p className="wishlist-price">${product.price}</p>
+                  <p className="wishlist-stock">
                     In stock: {product.quantity > 0 ? 'Yes' : 'No'}
                   </p>
                 </Link>
                 <button
                   onClick={() => handleRemove(item.id)}
-                  className="mt-2 text-red-600 hover:text-red-800 font-medium w-full py-1 border border-red-600 rounded hover:bg-red-50 transition-colors"
+                  className="wishlist-remove-btn"
                 >
                   Remove
                 </button>
@@ -58,11 +68,11 @@ const Wishlist = () => {
           })}
         </div>
       ) : (
-        <div className="text-center py-8 text-gray-500">
-          Your wishlist is empty. Start adding products!
-        </div>
+        <div className="wishlist-empty">Your wishlist is empty. Start adding products!</div>
       )}
     </div>
+    <Footer />
+    </>
   );
 };
 

@@ -16,6 +16,7 @@ import PaymentList from'./components/pages/PaymentList';
 import Wishlist from './components/pages/Wishlist';
 import ContactForm from './components/pages/ContactForm';
 import ReviewList from './components/pages/ReviewList';
+import PaymentSuccess from './components/pages/PaymentSuccess';
 
 
 const App = () => {
@@ -38,6 +39,7 @@ const App = () => {
         <Route path="/orders" element={<OrderList />} />
         <Route path="/orders/:id" element={<OrderDetail />} />
         <Route path="/payments" element={<PaymentList />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/contact" element={<ContactForm />} />
         <Route path="/reviews" element={<ReviewList />} />

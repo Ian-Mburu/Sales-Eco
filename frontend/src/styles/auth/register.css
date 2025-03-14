@@ -1,11 +1,12 @@
-.login-container {
+.register-container {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
+    margin: 100px 0 0 0;
   }
   
-  .login-form {
+  .register-form {
     background: #ff02028e;
     padding: 2rem;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -14,7 +15,7 @@
     max-width: 400px;
   }
   
-  .login-form h2 {
+  .register-form h2 {
     margin-bottom: 1rem;
     color: #333;
   }
@@ -44,17 +45,20 @@
     background: #ee0b0b;
   }
   
-  .login-links {
+  .register-links {
     margin-top: 1rem;
   }
   
-  .login-links a {
+  .login-link {
     color: #ffffff;
     text-decoration: none;
+  }
+
+.login-link:hover {
+    color: #ee0b0b;
   }
   
   .error-message {
     color: red;
     font-size: 0.9rem;
   }
-  

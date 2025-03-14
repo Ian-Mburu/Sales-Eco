@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API from '../../services/api';
+import '../../styles/auth/register.css';
+import Footer from '../Footer-Header/Footer';
+import Header from '../Footer-Header/Header';
 
 const Register = () => {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
-    confirmPassword: '',
-    password2: ''
+    confirmPassword: ''
   });
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -41,17 +43,22 @@ const Register = () => {
   };
 
   return (
+    <>
+    <Header />
     <div className="register-container">
-      <h2>Register</h2>
-      {error && <p className="error-message">{error}</p>}
-      <form onSubmit={handleSubmit}>
+      <form className="register-form" onSubmit={handleSubmit}>
+        <h2>Register</h2>
+        {error && <p className="error-message">{error}</p>}
         <input type="text" name="username" placeholder="Username" value={formData.username} onChange={handleChange} required />
         <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
         <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} required />
         <input type="password" name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange} required />
+        <p>Already have an account? <a className='login-link' href="/login">Login</a></p>
         <button type="submit">Register</button>
       </form>
     </div>
+    <Footer />
+    </>
   );
 };
 

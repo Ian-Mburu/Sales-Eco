@@ -19,7 +19,7 @@ const Header = () => {
         <Link className='links-nav' to='/'>Home</Link>
         <Link className='links-nav' to='/'>About</Link>
         <Link className='links-nav' to='/products'>Products</Link>
-        <Link className='links-nav' to='/categories'>Categories</Link>
+        <Link className='links-nav' to='/wishlist'>Wishlist</Link>
         <Link className='links-nav' to='/contact'>Contact</Link>
         <Link className='links-nav' to="/cart">
           <TbShoppingCartFilled className="icon" />

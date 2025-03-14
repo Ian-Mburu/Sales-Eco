@@ -263,7 +263,7 @@ class WishlistListView(generics.ListCreateAPIView):
 
 class WishlistDetailView(generics.DestroyAPIView):
     serializer_class = products_serializer.WishlistSerializer
-    permission_classes = [AllowAny,]
+    permission_classes = [IsAuthenticated,]
 
     def get_object(self):
         try:

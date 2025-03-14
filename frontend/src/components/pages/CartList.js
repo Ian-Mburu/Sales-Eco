@@ -5,9 +5,11 @@ import { fetchCart, updateCartItem, removeCartItem } from '../../slices/CartSlic
 import '../../styles/pages/cart.css';
 import Header from '../Footer-Header/Header';
 import Footer from '../Footer-Header/Footer';
+import { useNavigate } from 'react-router-dom';
 import { FaTrash, FaPlus, FaMinus } from 'react-icons/fa';
 
 const CartList = () => {
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const { items: cartItems, loading } = useSelector(state => state.cart);
 
@@ -104,7 +106,13 @@ const CartList = () => {
                                     <span>Subtotal ({cartItems.length} items)</span>
                                     <span>{calculateTotal()}</span>
                                 </div>
-                                <button className="checkout-button">Proceed to Checkout</button>
+                                <button 
+    className="checkout-button" 
+    onClick={() => navigate('/payments', { state: { totalAmount: calculateTotal() } })}
+>
+    Proceed to Checkout
+</button>
+
                             </motion.div>
                         </>
                     )}
