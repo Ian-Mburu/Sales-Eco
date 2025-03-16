@@ -17,6 +17,9 @@ import Wishlist from './components/pages/Wishlist';
 import ContactForm from './components/pages/ContactForm';
 import ReviewList from './components/pages/ReviewList';
 import PaymentSuccess from './components/pages/PaymentSuccess';
+import MessageButton from './components/pages/MessageButton';
+import Notification from './components/pages/Notification';
+import PublicProfile from './components/auth/PublicProfile';
 
 
 const App = () => {
@@ -26,7 +29,8 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile/:username" element={<PublicProfile />} />
+        <Route path="/my-profile" element={<Profile />} />
         <Route path="/products" element={<ProductList />} />
         <Route path="/products/:slug" element={<ProductDetail />} />
         <Route path="/categories" element={<CategoriesList />} />
@@ -43,6 +47,8 @@ const App = () => {
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/contact" element={<ContactForm />} />
         <Route path="/reviews" element={<ReviewList />} />
+        <Route path="/message" element={<MessageButton />} />
+        <Route path="/notification" element={<Notification />} />
       </Routes>
     </Router>
   );

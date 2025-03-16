@@ -1,4 +1,6 @@
 from django.shortcuts import get_object_or_404, render
+from products.models import Message, Notification, Profile
+from django.db.models import Q
 
 # custom imports
 from products import serializers as products_serializer
@@ -19,6 +21,7 @@ from rest_framework.pagination import PageNumberPagination # type: ignore
 from rest_framework.decorators import api_view, permission_classes # type: ignore
 from rest_framework_simplejwt.tokens import RefreshToken # type: ignore
 from django.http import Http404
+from rest_framework.exceptions import NotFound # type: ignore
 
 # Create your views here.
 
@@ -47,6 +50,20 @@ class ProfileView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         return self.request.user.profile
 
+class PublicProfileView(generics.RetrieveAPIView):
+    serializer_class = products_serializer.PublicProfileSerializer
+    permission_classes = [AllowAny]
+    lookup_field = 'user__username'
+    lookup_url_kwarg = 'username'
+
+    def get_queryset(self):
+        return Profile.objects.select_related('user').all()
+
+    def get_object(self):
+        try:
+            return super().get_object()
+        except Http404:
+            raise NotFound(detail=f"User with username '{self.kwargs['username']}' not found")
     
 class CategoryView(generics.ListAPIView):
     serializer_class = products_serializer.CategorySerializer
@@ -288,3 +305,32 @@ class ContactDetailView(generics.RetrieveUpdateDestroyAPIView):
             return products_models.Contact.objects.get(id=self.kwargs['pk'])
         except products_models.Contact.DoesNotExist:
             raise Http404('Contact message not found')
+        
+class MessageViewSet(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = products_serializer.MessageSerializer
+
+    def get_queryset(self):
+        return products_models.Message.objects.filter(
+            Q(sender=self.request.user) | 
+            Q(recipient=self.request.user)
+        ).order_by('-timestamp')
+
+    def perform_create(self, serializer):
+        serializer.save(sender=self.request.user)
+
+
+class CreateMessageView(generics.CreateAPIView):
+    serializer_class = products_serializer.MessageSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(sender=self.request.user)
+
+
+class NotificationViewSet(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = products_serializer.NotificationSerializer
+
+    def get_queryset(self):
+        return Notification.objects.filter(user=self.request.user)

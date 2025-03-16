@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { getUserProfile } from '../../slices/profileSlice';
 import Header from '../Footer-Header/Header';
 import Footer from '../Footer-Header/Footer';
+import MessageButton from '../pages/MessageButton';
+import Notification from '../pages/Notification';
 import '../../styles/auth/profile.css';
 
 const Profile = () => {
@@ -17,9 +19,22 @@ const Profile = () => {
 
   useEffect(() => {
     if (error) {
-      navigate('/login'); // Redirect to login if profile is not retrievable
+      navigate('/my-profile'); // Redirect to login if profile is not retrievable
     }
   }, [error, navigate]);
+
+
+  if (status === 'loading') return (
+    <div className="loading-container">
+      <div className="loading-spinner"></div>
+    </div>
+  );
+
+  if (!profile) return (
+    <div className="error-message">
+      Profile not found or <a href="/login">Login</a> to view profile
+    </div>
+  );
 
   if (status === 'loading') return <div className="loading-message">Loading profile...</div>;
 
@@ -33,6 +48,7 @@ const Profile = () => {
               <img src={profile.image} alt={profile.username} className="profile-img" />
               <div className="profile-info">
                 <h1>{profile.full_name}</h1>
+                <p>@{profile.username}</p>
                 <button onClick={() => navigate('/update-profile')} className="edit-profile-btn">Edit Profile</button>
               </div>
             </div>
@@ -40,9 +56,10 @@ const Profile = () => {
               <p><strong>Email:</strong> {profile.email}</p>
               <p><strong>Bio:</strong> {profile.bio || 'No bio yet'}</p>
               <p><strong>Location:</strong> {profile.county || 'Not specified'}</p>
+              <p><strong>Joined:</strong> {new Date(profile.join_date).toLocaleDateString()}</p>
             </div>
             <div className="profile-activity">
-              <h3 className='activity'>Activity</h3>
+              <h3>Activity</h3>
               <p><strong>Total Listings:</strong> {profile.total_listings || 0}</p>
               <p><strong>Total Orders:</strong> {profile.total_orders || 0}</p>
               <p><strong>Wishlist Items:</strong> {profile.wishlist_count || 0}</p>
@@ -52,6 +69,8 @@ const Profile = () => {
               <p><strong>Last Login:</strong> {new Date(profile.last_login).toLocaleString()}</p>
               <button className="security-btn">Change Password</button>
             </div>
+            <Notification />
+            <MessageButton seller={profile} />
           </div>
         )}
       </div>

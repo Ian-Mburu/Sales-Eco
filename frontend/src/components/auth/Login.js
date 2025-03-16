@@ -25,7 +25,7 @@ const Login = () => {
       localStorage.setItem('refresh_token', refresh);
       
       dispatch(setCredentials({ user: { email }, token: access }));
-      navigate('/profile');
+      navigate('/my-profile');
     } catch (error) {
       setError('Invalid email or password. Please try again.');
     }

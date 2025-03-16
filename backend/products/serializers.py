@@ -58,6 +58,20 @@ class ProfileSerializer(serializers.ModelSerializer):
             'bio', 'county', 'facebook', 'twitter', 'date'
         ]
 
+class PublicProfileSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username')
+    join_date = serializers.DateTimeField(source='user.date_joined')
+    email = serializers.EmailField(source='user.email')
+    full_name = serializers.CharField(source='user.full_name')
+
+    class Meta:
+        model = products_models.Profile
+        fields = [
+            'username', 'email', 'full_name', 'image', 
+            'bio', 'county', 'facebook', 'twitter', 
+            'date', 'join_date'
+        ]
+
 class CategorySerializer(serializers.ModelSerializer):
     post_count = serializers.SerializerMethodField()
 
@@ -158,3 +172,31 @@ class ContactSerializer(serializers.ModelSerializer):
     class Meta:
         model = products_models.Contact
         fields = ('__all__')
+
+from .models import Message, User  # Add this import
+
+# serializers.py
+class MessageSerializer(serializers.ModelSerializer):
+    sender_username = serializers.CharField(source='sender.username', read_only=True)
+    recipient_username = serializers.CharField(source='recipient.username', read_only=True)
+
+    class Meta:
+        model = Message
+        fields = ['id', 'sender', 'recipient', 'content', 'timestamp', 'read', 
+                 'sender_username', 'recipient_username']
+        read_only_fields = ['sender', 'timestamp', 'read']
+
+    def validate_recipient(self, value):
+        if not User.objects.filter(id=value.id).exists():
+            raise serializers.ValidationError("Recipient does not exist")
+        return value
+
+class NotificationSerializer(serializers.ModelSerializer):
+    message_content = serializers.CharField(source='message.content')
+    sender_username = serializers.CharField(source='message.sender.username')
+    created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
+
+    
+    class Meta:
+        model = products_models.Notification
+        fields = ['id', 'message_content', 'sender_username', 'created_at', 'viewed']

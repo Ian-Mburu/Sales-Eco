@@ -10,6 +10,8 @@ urlpatterns = [
 
     # Profile Endpoints
     path('profile/', products_views.ProfileView.as_view(), name='profile-detail'),
+    path('profile/<str:username>/', products_views.PublicProfileView.as_view(), name='public-profile'),
+
 
     # Category Endpoints
     path('categories/', products_views.CategoryView.as_view(), name='category-list'),
@@ -49,4 +51,9 @@ urlpatterns = [
     # Contact Endpoints
     path('contact/', products_views.ContactListView.as_view(), name='contact-list'),
     path('contact/<int:pk>/', products_views.ContactDetailView.as_view(), name='contact-detail'),
+
+    # Messaging Endpoints
+    path('messages/', products_views.MessageViewSet.as_view(), name='message-list'),
+    path('messages/create/', products_views.CreateMessageView.as_view(), name='create-message'),
+    path('notifications/', products_views.NotificationViewSet.as_view(), name='notification-list'),
 ]

@@ -9,6 +9,9 @@ import ReviewReducer from '../slices/ReviewSlice'
 import WishlistReducer from '../slices/WishlistSlice'
 import ContactReducer from '../slices/ContactSlice'
 import CartReducer from '../slices/CartSlice'
+import messageReducer from '../slices/MessageSlice'
+import notificationReducer from '../slices/NotificationSlice'
+import publicProfileReducer from '../slices/PublicProfileSlice'
 
 
 
@@ -24,5 +27,8 @@ export const store = configureStore({
     wishlist: WishlistReducer,
     contact: ContactReducer,
     cart: CartReducer,
+    messages: messageReducer,
+    notifications: notificationReducer,
+    publicProfile: publicProfileReducer
   },
 });

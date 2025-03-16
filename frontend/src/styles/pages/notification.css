@@ -1,0 +1,78 @@
+/* notification.css */
+.notification-bell {
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: red;
+  color: white;
+  border-radius: 50%;
+  padding: 3px 8px;
+  font-size: 0.8rem;
+}
+
+.notification-dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1000;
+  display: none;
+}
+
+.notification-bell:hover .notification-dropdown {
+  display: block;
+}
+
+.notification-item {
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.notification-item p {
+  margin: 0 0 0.5rem 0;
+}
+
+.notification-item small {
+  color: #666;
+  font-size: 0.8rem;
+}
+
+/* message-widget.css */
+.message-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 300px;
+  background: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  padding: 1rem;
+  z-index: 1000;
+}
+
+.message-widget textarea {
+  width: 100%;
+  height: 100px;
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+}
+
+.message-widget button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}

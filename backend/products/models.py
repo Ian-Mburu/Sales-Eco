@@ -205,3 +205,18 @@ class Contact(models.Model):
 
     def __str__(self):
         return self.name
+    
+# models.py
+class Message(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
+    content = models.TextField()
+    product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    read = models.BooleanField(default=False)
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.ForeignKey(Message, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    viewed = models.BooleanField(default=False)

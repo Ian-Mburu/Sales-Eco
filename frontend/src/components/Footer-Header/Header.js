@@ -24,7 +24,7 @@ const Header = () => {
         <Link className='links-nav' to="/cart">
           <TbShoppingCartFilled className="icon" />
         </Link>
-        <Link className='links-nav' to="/profile">
+        <Link className='links-nav' to="/my-profile">
           <RiUser6Fill className="icon" />
         </Link>
       </div>

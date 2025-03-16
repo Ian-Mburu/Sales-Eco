@@ -161,6 +161,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',  # Restrict API access to logged-in users
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ),
 }
 
