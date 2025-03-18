@@ -32,7 +32,9 @@ const messageSlice = createSlice({
       })
       .addCase(sendMessage.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.payload;
+        state.error = action.payload?.message || 
+                      action.payload?.detail || 
+                      'Failed to send message';
       });
   }
 });

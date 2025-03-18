@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render
-from products.models import Message, Notification, Profile
+from products.models import Message, Notification, Profile, User
 from django.db.models import Q
 
 # custom imports
@@ -11,7 +11,7 @@ from drf_yasg.utils import swagger_auto_schema # type: ignore
 
 
 # rest framework imports
-from rest_framework import status # type: ignore
+from rest_framework import status, serializers # type: ignore
 from rest_framework.decorators import APIView# type: ignore
 from rest_framework.response import Response # type: ignore
 from rest_framework_simplejwt.views import TokenObtainPairView # type: ignore
@@ -87,17 +87,18 @@ class ProductPagination(PageNumberPagination):
     page_size_query_param = 'page_size'
     max_page_size = 100
 class ProductsListView(generics.ListAPIView):
-    # pagination_class = PageNumberPagination
-    # page_size = 20
     serializer_class = products_serializer.ProductSerializer
-    permission_classes = [AllowAny,]
-    queryset = products_models.Product.objects.all()
-    pagination_class = ProductPagination
-
-
+    permission_classes = [AllowAny]
     
-    def get_serializer_context(self):
-        return {'request': self.request}
+    # Remove this line to disable pagination
+    # pagination_class = ProductPagination
+    
+    def get_queryset(self):
+        return products_models.Product.objects.select_related(
+            'profile__user'
+        ).prefetch_related(
+            'likes'
+        ).all()
     
 class ProductsDetailView(generics.RetrieveAPIView):
     serializer_class = products_serializer.ProductSerializer
@@ -114,25 +115,26 @@ class ProductsDetailView(generics.RetrieveAPIView):
             raise Http404('product not found')
 
 class LikeProductAPIView(APIView):
-    permission_classes = [AllowAny,]
+    permission_classes = [IsAuthenticated]
     
-    def post(self, request):
+    def post(self, request, pk):  # Get product ID from URL
         try:
-            products = products_models.Product.objects.get(id=request.data.get('product_id'))
+            product = products_models.Product.objects.get(id=pk)
             user = request.user
-            if products.likes.filter(id=user.id).exists():
-                products.likes.remove(user)
+            
+            if product.likes.filter(id=user.id).exists():
+                product.likes.remove(user)
                 action = 'disliked'
             else:
-                products.likes.add(user)
-                action= 'liked'
+                product.likes.add(user)
+                action = 'liked'
 
             return Response({
-                    "message": f"Products {action} successfully",
-                    "action": action,
-                    "likes_count": products.likes.count()
-                }, status=status.HTTP_200_OK)
-    
+                "message": f"Product {action} successfully",
+                "action": action,
+                "likes_count": product.likes.count()
+            }, status=status.HTTP_200_OK)
+            
         except products_models.Product.DoesNotExist:
             return Response({"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND)
         
@@ -169,7 +171,13 @@ class AddToCartView(APIView):
             cart_item.total_price = cart_item.quantity * product.price
             cart_item.save()
 
-        return Response(products_serializer.CartSerializer(cart_item).data, status=status.HTTP_201_CREATED)
+        return Response(
+            products_serializer.CartSerializer(
+                cart_item,
+                context={'request': request}  # Add this line
+            ).data, 
+            status=status.HTTP_201_CREATED
+        )
 
     
 class UpdateCartView(APIView):
@@ -270,13 +278,21 @@ class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
 class WishlistListView(generics.ListCreateAPIView):
     serializer_class = products_serializer.WishlistSerializer
     permission_classes = [IsAuthenticated] 
-    pagination_class = PageNumberPagination
 
     def get_queryset(self):
         return products_models.Wishlist.objects.filter(user=self.request.user)
+    
+class WishlistCreateView(generics.CreateAPIView):
+    serializer_class = products_serializer.WishlistSerializer
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        product = get_object_or_404(products_models.Product, id=self.kwargs['pk'])
+        # Prevent duplicate entries
+        if products_models.Wishlist.objects.filter(user=self.request.user, product=product).exists():
+            raise serializers.ValidationError({"detail": "Product is already in your wishlist."})
+        serializer.save(user=self.request.user, product=product)
+
 
 class WishlistDetailView(generics.DestroyAPIView):
     serializer_class = products_serializer.WishlistSerializer
@@ -306,18 +322,27 @@ class ContactDetailView(generics.RetrieveUpdateDestroyAPIView):
         except products_models.Contact.DoesNotExist:
             raise Http404('Contact message not found')
         
+
 class MessageViewSet(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = products_serializer.MessageSerializer
 
-    def get_queryset(self):
-        return products_models.Message.objects.filter(
-            Q(sender=self.request.user) | 
-            Q(recipient=self.request.user)
-        ).order_by('-timestamp')
-
     def perform_create(self, serializer):
-        serializer.save(sender=self.request.user)
+        recipient_username = self.request.data.get('recipient')
+        try:
+            recipient = User.objects.get(username=recipient_username)
+            message = serializer.save(sender=self.request.user, recipient=recipient)
+            
+            # Create notification for recipient
+            Notification.objects.create(
+                user=recipient,
+                message=message,
+                viewed=False
+            )
+        except User.DoesNotExist:
+            raise products_serializer.serializers.ValidationError({
+                "recipient": f"User with username {recipient_username} does not exist"
+            })
 
 
 class CreateMessageView(generics.CreateAPIView):

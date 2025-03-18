@@ -1,3 +1,8 @@
+body {
+  background-color: #000;
+  color: #fff;
+}
+
 .categories {
     max-width: 950px;
     margin: 100px 0 0 150px;

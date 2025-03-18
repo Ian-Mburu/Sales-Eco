@@ -1,5 +1,5 @@
 from django.urls import path
-from rest_framework_simplejwt.views import TokenRefreshView # type: ignore
+from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView # type: ignore
 from . import views as products_views
 
 urlpatterns = [
@@ -7,6 +7,8 @@ urlpatterns = [
     path('auth/login/', products_views.MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/register/', products_views.RegisterView.as_view(), name='register'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+
 
     # Profile Endpoints
     path('profile/', products_views.ProfileView.as_view(), name='profile-detail'),
@@ -19,8 +21,8 @@ urlpatterns = [
 
     # Product Endpoints
     path('products/', products_views.ProductsListView.as_view(), name='product-list'),
+    path('api/products/<int:pk>/like/', products_views.LikeProductAPIView.as_view(), name='like-product'),
     path('products/<slug:slug>/', products_views.ProductsDetailView.as_view(), name='product-detail'),
-    path('products/like/', products_views.LikeProductAPIView.as_view(), name='like-product'),
 
     # Cart Endpoints
     path('cart/', products_views.CartListView.as_view(), name='cart-list'),
@@ -45,8 +47,10 @@ urlpatterns = [
     path('reviews/<int:pk>/', products_views.ReviewDetailView.as_view(), name='review-detail'),
 
     # Wishlist Endpoints
-    path('wishlist/', products_views.WishlistListView.as_view(), name='wishlist-list'),
-    path('wishlist/<int:pk>/', products_views.WishlistDetailView.as_view(), name='wishlist-detail'),
+    path('api/wishlist/', products_views.WishlistListView.as_view(), name='wishlist-list'),
+    path('api/wishlist/add/<int:pk>/', products_views.WishlistCreateView.as_view(), name='add-to-wishlist'),
+    path('/api/wishlist/<int:pk>/', products_views.WishlistDetailView.as_view(), name='wishlist-detail'),
+
 
     # Contact Endpoints
     path('contact/', products_views.ContactListView.as_view(), name='contact-list'),
@@ -54,6 +58,6 @@ urlpatterns = [
 
     # Messaging Endpoints
     path('messages/', products_views.MessageViewSet.as_view(), name='message-list'),
-    path('messages/create/', products_views.CreateMessageView.as_view(), name='create-message'),
+    path('messages/create/', products_views.MessageViewSet.as_view(), name='create-message'),
     path('notifications/', products_views.NotificationViewSet.as_view(), name='notification-list'),
 ]

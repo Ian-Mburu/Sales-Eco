@@ -113,6 +113,12 @@ class ProductSerializer(serializers.ModelSerializer):
             return request.build_absolute_uri(product.image.url)
         return None
 
+    def get_seller(self, obj):
+        return {
+            'username': obj.profile.user.username,
+            'image': self.context['request'].build_absolute_uri(obj.profile.image.url) if obj.profile.image else None
+        }
+
 class CartSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True)  # Add nested product serializer
     product_image = serializers.SerializerMethodField()
@@ -179,6 +185,10 @@ from .models import Message, User  # Add this import
 class MessageSerializer(serializers.ModelSerializer):
     sender_username = serializers.CharField(source='sender.username', read_only=True)
     recipient_username = serializers.CharField(source='recipient.username', read_only=True)
+    recipient = serializers.SlugRelatedField(
+        slug_field='username',
+        queryset=User.objects.all()
+    )
 
     class Meta:
         model = Message
@@ -195,8 +205,9 @@ class NotificationSerializer(serializers.ModelSerializer):
     message_content = serializers.CharField(source='message.content')
     sender_username = serializers.CharField(source='message.sender.username')
     created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
+    message_id = serializers.IntegerField(source='message.id')
 
-    
     class Meta:
         model = products_models.Notification
-        fields = ['id', 'message_content', 'sender_username', 'created_at', 'viewed']
+        fields = ['id', 'message_content', 'sender_username', 
+                 'created_at', 'viewed', 'message_id']

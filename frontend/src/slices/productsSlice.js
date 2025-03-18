@@ -1,68 +1,153 @@
-// src/features/productsSlice.js
+// productsSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { fetchProducts, fetchProductDetail } from '../services/productService';
-import axios from 'axios';
-
-const initialState = {
-  products: [],
-  product: null,  
-  productsStatus: 'idle',
-  productStatus: 'idle',
-  cartStatus: 'idle', 
-  error: null,
-};
+import API from '../services/api';
 
 export const getProducts = createAsyncThunk(
-  'products/fetchAll',
-  async () => {
-    return fetchProducts();
+  'products/getAll',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await API.get('/products/');
+      // Ensure the response data is an array
+      if (!Array.isArray(response.data)) {
+        throw new Error('Expected an array of products');
+      }
+      return response.data; // This should be an array
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
   }
 );
 
 export const getProductDetail = createAsyncThunk(
-  'products/fetchDetail',
-  async (slug) => {
-    return fetchProductDetail(slug);
+  'products/getDetail',
+  async (productId, { rejectWithValue }) => {
+    try {
+      const response = await API.get(`/products/${productId}/`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
   }
 );
 
 export const addToCart = createAsyncThunk(
-  'cart/add',
-  async (productId, { rejectWithValue }) => {
+  'products/addToCart',
+  async ({ productId, quantity }, { rejectWithValue }) => {
     try {
-      const response = await axios.post('/api/cart/add/', { product_id: productId });
+      const response = await API.post('/cart/add/', { product_id: productId, quantity });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Failed to add to cart');
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const likeProduct = createAsyncThunk(
+  'products/like',
+  async (productId, { rejectWithValue }) => {
+    try {
+      const response = await API.post(`/products/${productId}/like/`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const addToWishlist = createAsyncThunk(
+  'products/wishlist',
+  async (productId, { rejectWithValue }) => {
+    try {
+      const response = await API.post(`/wishlist/add/${productId}/`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
     }
   }
 );
 
 const productsSlice = createSlice({
   name: 'products',
-  initialState,
+  initialState: {
+    products: [],
+    productDetail: null,
+    productsStatus: 'idle',
+    productDetailStatus: 'idle',
+    error: null,
+    cartStatus: 'idle',
+    likeStatus: 'idle',
+    wishlistStatus: 'idle',
+    currentProductId: null
+  },
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // Get Products
       .addCase(getProducts.pending, (state) => {
-        state.status = 'loading';
+        state.productsStatus = 'loading';
       })
       .addCase(getProducts.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.products = action.payload.results || [];
+        state.productsStatus = 'succeeded';
+        state.products = action.payload;
       })
-      .addCase(getProducts.rejected, (state, action) => { // Add error case
-        state.status = 'failed';
-        state.error = action.error.message;
+      .addCase(getProducts.rejected, (state, action) => {
+        state.productsStatus = 'failed';
+        state.error = action.payload;
       })
-      .addCase(getProductDetail.pending, (state) => {
-        state.status = 'loading';
+      
+      // Add to Cart
+      .addCase(addToCart.pending, (state, action) => {
+        state.cartStatus = 'loading';
+        state.currentProductId = action.meta.arg.productId;
       })
-      .addCase(getProductDetail.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.product = action.payload;
+      .addCase(addToCart.fulfilled, (state) => {
+        state.cartStatus = 'succeeded';
+        state.currentProductId = null;
+      })
+      .addCase(addToCart.rejected, (state, action) => {
+        state.cartStatus = 'failed';
+        state.currentProductId = null;
+        state.error = action.payload;
+      })
+      
+      // Like Product
+      .addCase(likeProduct.pending, (state, action) => {
+        state.likeStatus = 'loading';
+        state.currentProductId = action.meta.arg;
+      })
+      .addCase(likeProduct.fulfilled, (state, action) => {
+        state.likeStatus = 'succeeded';
+        const index = state.products.findIndex(p => p.id === action.payload.id);
+        if (index >= 0) {
+          state.products[index] = action.payload;
+        }
+        state.currentProductId = null;
+      })
+      .addCase(likeProduct.rejected, (state, action) => {
+        state.likeStatus = 'failed';
+        state.currentProductId = null;
+        state.error = action.payload;
+      })
+      
+      // Wishlist
+      .addCase(addToWishlist.pending, (state, action) => {
+        state.wishlistStatus = 'loading';
+        state.currentProductId = action.meta.arg;
+      })
+      .addCase(addToWishlist.fulfilled, (state, action) => {
+        state.wishlistStatus = 'succeeded';
+        const index = state.products.findIndex(p => p.id === action.payload.id);
+        if (index >= 0) {
+          state.products[index] = action.payload;
+        }
+        state.currentProductId = null;
+      })
+      .addCase(addToWishlist.rejected, (state, action) => {
+        state.wishlistStatus = 'failed';
+        state.currentProductId = null;
+        state.error = action.payload;
       });
-  },
+  }
 });
 
 export default productsSlice.reducer;

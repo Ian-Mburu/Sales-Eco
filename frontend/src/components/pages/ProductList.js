@@ -1,28 +1,57 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { getProducts, addToCart } from '../../slices/productsSlice';
+import { 
+  getProducts, 
+  addToCart,
+  likeProduct,
+  addToWishlist
+} from '../../slices/productsSlice';
 import Footer from '../Footer-Header/Footer';
 import Header from '../Footer-Header/Header';
 import '../../styles/pages/productList.css';
-import { IoMdHeartEmpty } from "react-icons/io";
-import { FaHeart, FaShoppingCart } from "react-icons/fa";
+import { IoMdHeartEmpty, IoMdHeart } from "react-icons/io";
+import { FaHeart, FaRegHeart, FaShoppingCart } from "react-icons/fa";
 import CategoriesList from '../../components/pages/CategoriesList';
+import Loader from '../../components/Loader/Loader';
 
 const ProductList = () => {
   const dispatch = useDispatch();
-  const { products, productsStatus, error, cartStatus } = useSelector((state) => state.products);
+  const { 
+  products = [], // Default to an empty array if undefined
+  productsStatus, 
+  error, 
+  cartStatus,
+  likeStatus,
+  wishlistStatus,
+  currentProductId
+  } = useSelector((state) => state.products);
 
   useEffect(() => {
     dispatch(getProducts());
   }, [dispatch]);
 
-  const handleAddToCart = (productId, e) => {
-    e.preventDefault(); // Prevent link navigation when clicking the cart button
-    dispatch(addToCart(productId));
+  // Add this validation
+if (!Array.isArray(products)) {
+  return <div className="text-center py-8">Invalid products data format</div>;
+}
+
+  const handleCart = (productId, e) => {
+    e.preventDefault();
+    dispatch(addToCart({ productId, quantity: 1 }));
   };
 
-  if (productsStatus === 'loading') return <div className="text-center py-8">Loading products...</div>;
+  const handleLike = (productId, e) => {
+    e.preventDefault();
+    dispatch(likeProduct(productId));
+  };
+
+  const handleWishlist = (productId, e) => {
+    e.preventDefault();
+    dispatch(addToWishlist(productId));
+  };
+
+  if (productsStatus === 'loading') return <div className="text-center py-8"><Loader /></div>;
   if (error) return <div className="text-red-500 text-center py-8">Error: {error}</div>;
   if (!products || products.length === 0) return <div className="text-center py-8">No products found</div>;
 
@@ -38,18 +67,22 @@ const ProductList = () => {
                 <Link 
                   to={`/profile/${product.seller.username}`} 
                   className="seller-link"
-                  onClick={(e) => e.stopPropagation()} // Prevent conflict with outer link
+                  onClick={(e) => e.stopPropagation()}
                 >
                   <img src={product.seller.image} alt={product.seller.username} className="seller-img" />
                   <p className='seller-username'>{product.seller.username}</p>
                 </Link>
-                <Link 
+                <button 
                   className='add-cart' 
-                  onClick={(e) => handleAddToCart(product.id, e)}
-                  disabled={cartStatus === 'loading'}
+                  onClick={(e) => handleCart(product.id, e)}
+                  disabled={cartStatus === 'loading' && currentProductId === product.id}
                 >
-                  <FaShoppingCart className='cart-icon' />
-                </Link>
+                  {cartStatus === 'loading' && currentProductId === product.id ? (
+                    <Loader size="small" />
+                  ) : (
+                    <FaShoppingCart className='cart-icon' />
+                  )}
+                </button>
               </div>
 
               <img className='prd-image' src={product.image} alt={product.title} />
@@ -65,11 +98,30 @@ const ProductList = () => {
               
               <div className='date-prd'>
                 <div className='likes'>
-                  <IoMdHeartEmpty className='like-icon' />
-                  <p className="likes-prd"> {product.likes_count}</p>
+                  <button 
+                    onClick={(e) => handleLike(product.id, e)}
+                    disabled={likeStatus === 'loading' && currentProductId === product.id}
+                  >
+                    {product.has_liked ? (
+                      <IoMdHeart className="like-icon text-red-500" />
+                    ) : (
+                      <IoMdHeartEmpty className="like-icon" />
+                    )}
+                  </button>
+                  <p className="likes-prd">{product.likes_count}</p>
                 </div>
                 
-                <Link to="#" className='add-wishlist'><FaHeart className='wishlist-icon' /></Link>
+                <button 
+                  onClick={(e) => handleWishlist(product.id, e)}
+                  disabled={wishlistStatus === 'loading' && currentProductId === product.id}
+                  className='add-wishlist'
+                >
+                  {product.is_in_wishlist ? (
+                    <FaHeart className='wishlist-icon text-red-500' />
+                  ) : (
+                    <FaRegHeart className='wishlist-icon' />
+                  )}
+                </button>
               </div>  
             </div>
           </div>

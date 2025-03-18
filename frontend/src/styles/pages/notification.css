@@ -76,3 +76,34 @@
   padding: 0.5rem 1rem;
   cursor: pointer;
 }
+
+/* notification.css */
+.reply-modal .error-message {
+  color: #dc3545;
+  margin-bottom: 10px;
+  padding: 8px;
+  background: #f8d7da;
+  border-radius: 4px;
+}
+
+.modal-actions {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.modal-actions button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.reply-modal textarea {
+  width: 100%;
+  height: 120px;
+  padding: 8px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: vertical;
+}
