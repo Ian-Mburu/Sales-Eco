@@ -21,7 +21,7 @@ from rest_framework.pagination import PageNumberPagination # type: ignore
 from rest_framework.decorators import api_view, permission_classes # type: ignore
 from rest_framework_simplejwt.tokens import RefreshToken # type: ignore
 from django.http import Http404
-from rest_framework.exceptions import NotFound # type: ignore
+from rest_framework.exceptions import NotFound, ValidationError # type: ignore
 
 # Create your views here.
 
@@ -282,16 +282,22 @@ class WishlistListView(generics.ListCreateAPIView):
     def get_queryset(self):
         return products_models.Wishlist.objects.filter(user=self.request.user)
     
+
 class WishlistCreateView(generics.CreateAPIView):
     serializer_class = products_serializer.WishlistSerializer
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         product = get_object_or_404(products_models.Product, id=self.kwargs['pk'])
-        # Prevent duplicate entries
+        # Check for existing wishlist item
         if products_models.Wishlist.objects.filter(user=self.request.user, product=product).exists():
-            raise serializers.ValidationError({"detail": "Product is already in your wishlist."})
+            raise ValidationError({"detail": "Product is already in your wishlist."})
         serializer.save(user=self.request.user, product=product)
+
+    def handle_exception(self, exc):
+        if isinstance(exc, ValidationError):
+            return Response(exc.detail, status=status.HTTP_400_BAD_REQUEST)
+        return super().handle_exception(exc)
 
 
 class WishlistDetailView(generics.DestroyAPIView):

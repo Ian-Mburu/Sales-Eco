@@ -5,26 +5,40 @@ export const fetchWishlist = createAsyncThunk(
   'wishlist/fetch',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await API.get('/api/wishlist/');
+      const response = await API.get('/wishlist/');
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      console.error("Fetch Wishlist Error:", error.response?.data);  // Log the error
+      return rejectWithValue(error.response?.data?.detail || "Failed to fetch wishlist");
     }
   }
 );
 
+export const addToWishlist = createAsyncThunk(
+  'wishlist/add',
+  async (productId, { rejectWithValue }) => {
+    try {
+      const response = await API.post(`/wishlist/add/${productId}/`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.detail || "Failed to add to wishlist");
+    }
+  }
+);
 
 export const removeFromWishlist = createAsyncThunk(
   'wishlist/remove',
   async (itemId, { rejectWithValue }) => {
     try {
-      await API.delete(`/wishlist/${itemId}/`); // Ensure correct API endpoint
-      return itemId; // Only return ID to update state without refetching
+      await API.delete(`/wishlist/${itemId}/`);
+      return itemId;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Failed to remove item");
+      console.error("Remove Wishlist Error:", error.response?.data);
+      return rejectWithValue(error.response?.data?.detail || "Failed to remove item");
     }
   }
 );
+
 
 
 export const fetchProductDetails = createAsyncThunk(

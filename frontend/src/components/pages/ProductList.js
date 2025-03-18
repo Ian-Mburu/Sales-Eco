@@ -5,7 +5,6 @@ import {
   getProducts, 
   addToCart,
   likeProduct,
-  addToWishlist
 } from '../../slices/productsSlice';
 import Footer from '../Footer-Header/Footer';
 import Header from '../Footer-Header/Header';
@@ -14,6 +13,7 @@ import { IoMdHeartEmpty, IoMdHeart } from "react-icons/io";
 import { FaHeart, FaRegHeart, FaShoppingCart } from "react-icons/fa";
 import CategoriesList from '../../components/pages/CategoriesList';
 import Loader from '../../components/Loader/Loader';
+import { fetchWishlist, addToWishlist } from '../../slices/WishlistSlice';
 
 const ProductList = () => {
   const dispatch = useDispatch();
@@ -48,7 +48,14 @@ if (!Array.isArray(products)) {
 
   const handleWishlist = (productId, e) => {
     e.preventDefault();
-    dispatch(addToWishlist(productId));
+    dispatch(addToWishlist(productId))
+      .unwrap()
+      .then(() => {
+        dispatch(fetchWishlist());  // Refresh wishlist after adding
+      })
+      .catch((error) => {
+        console.error("Wishlist error:", error);
+      });
   };
 
   if (productsStatus === 'loading') return <div className="text-center py-8"><Loader /></div>;
@@ -58,7 +65,10 @@ if (!Array.isArray(products)) {
   return (
     <>
       <Header />
-      <CategoriesList />
+      <div className='categories-prd'>
+        <CategoriesList />
+      </div>
+      
       <div className="prd-list">
         {products.map(product => (
           <div key={product.id} className="prd-list2">
@@ -101,9 +111,10 @@ if (!Array.isArray(products)) {
                   <button 
                     onClick={(e) => handleLike(product.id, e)}
                     disabled={likeStatus === 'loading' && currentProductId === product.id}
+                    className='add-like'
                   >
                     {product.has_liked ? (
-                      <IoMdHeart className="like-icon text-red-500" />
+                      <IoMdHeart className="like-icon" />
                     ) : (
                       <IoMdHeartEmpty className="like-icon" />
                     )}
@@ -117,7 +128,7 @@ if (!Array.isArray(products)) {
                   className='add-wishlist'
                 >
                   {product.is_in_wishlist ? (
-                    <FaHeart className='wishlist-icon text-red-500' />
+                    <FaHeart className='wishlist-icon' />
                   ) : (
                     <FaRegHeart className='wishlist-icon' />
                   )}

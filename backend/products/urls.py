@@ -7,7 +7,7 @@ urlpatterns = [
     path('auth/login/', products_views.MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/register/', products_views.RegisterView.as_view(), name='register'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+    path('auth/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 
 
     # Profile Endpoints
@@ -21,7 +21,7 @@ urlpatterns = [
 
     # Product Endpoints
     path('products/', products_views.ProductsListView.as_view(), name='product-list'),
-    path('api/products/<int:pk>/like/', products_views.LikeProductAPIView.as_view(), name='like-product'),
+    path('products/<int:pk>/like/', products_views.LikeProductAPIView.as_view(), name='like-product'),
     path('products/<slug:slug>/', products_views.ProductsDetailView.as_view(), name='product-detail'),
 
     # Cart Endpoints
@@ -47,9 +47,9 @@ urlpatterns = [
     path('reviews/<int:pk>/', products_views.ReviewDetailView.as_view(), name='review-detail'),
 
     # Wishlist Endpoints
-    path('api/wishlist/', products_views.WishlistListView.as_view(), name='wishlist-list'),
-    path('api/wishlist/add/<int:pk>/', products_views.WishlistCreateView.as_view(), name='add-to-wishlist'),
-    path('/api/wishlist/<int:pk>/', products_views.WishlistDetailView.as_view(), name='wishlist-detail'),
+    path('wishlist/', products_views.WishlistListView.as_view(), name='wishlist-list'),
+    path('wishlist/add/<int:pk>/', products_views.WishlistCreateView.as_view(), name='add-to-wishlist'),
+    path('wishlist/<int:pk>/', products_views.WishlistDetailView.as_view(), name='wishlist-detail'),
 
 
     # Contact Endpoints

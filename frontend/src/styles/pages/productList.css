@@ -15,6 +15,12 @@
     background: #d31616;
 }
 
+.categories-prd {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
 .seller-username {
     color: #f7f7f7;
 }
@@ -31,7 +37,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 5px;
+    gap: 15px;
 }
 
 .like-icon {
@@ -79,7 +85,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 210px;
+    gap: 160px;
     padding: 5px;
 }
 
@@ -116,6 +122,7 @@
 
 .cart-icon {
     color: #000;
+    background: none;
 }
 
 .cart-icon:hover {
@@ -130,8 +137,14 @@ p {
     color: #d31616;
 }
 
+.add-cart {
+    background: none;
+    color: #000;
+}
+
 .add-cart:hover {
-    color: #d31616;
+    color: #c56666;
+    background: none;
 }
   
 .date-posted {
@@ -141,4 +154,24 @@ p {
 
 .prd-3 {
     margin: -20px 0 0 0;
+}
+
+.add-wishlist {
+    background: none;
+    color: #000;
+}
+
+.add-wishlist:hover {
+    color: #d31616;
+    background: none;
+}
+
+.add-like {
+    background: none;
+    color: #000;
+}
+
+.add-like:hover {
+    color: #d31616;
+    background: none;
 }

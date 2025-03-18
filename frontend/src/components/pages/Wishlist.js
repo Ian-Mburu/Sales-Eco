@@ -37,7 +37,9 @@ const Wishlist = () => {
       {status === 'loading' ? (
         <div className="wishlist-loading">Login to view your wishlist <a className='wishlist-login' href='/login'>Login</a> </div>
       ) : error ? (
-        <div className="wishlist-error">{error}</div>
+        <div className="wishlist-error">
+    {typeof error === 'string' ? error : error?.detail || "An unexpected error occurred"}
+  </div>
       ) : items.length > 0 ? ( 
         <div className="wishlist-grid">
           {items.map((item) => {
