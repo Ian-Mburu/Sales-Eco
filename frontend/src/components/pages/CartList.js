@@ -31,21 +31,18 @@ const CartList = () => {
 
     const calculateTotal = () => {
         if (!cartItems || cartItems.length === 0) return "0.00";
-      
+    
         return cartItems.reduce((total, item) => {
-          // Handle both backend-calculated total and client-side verification
-          const backendTotal = parseFloat(item?.total_price) || 0;
-          const clientCalculated = (item?.product?.price || 0) * (item?.quantity || 0);
-          
-          // Prefer backend calculation but fallback to client-side
-          return total + (backendTotal > 0 ? backendTotal : clientCalculated);
+            const productPrice = parseFloat(item?.product?.price) || 0;
+            const quantity = parseInt(item?.quantity) || 0;
+            return total + productPrice * quantity;
         }, 0).toLocaleString('en-US', {
-          style: 'currency',
-          currency: 'USD',
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
         });
-      };
+    };
     
     
     
@@ -74,7 +71,7 @@ const CartList = () => {
                                     {cartItems.map(item => (
                                         <motion.div key={item.id} className="cart-item" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: 50 }} transition={{ duration: 0.3 }}>
                                             <div className="item-image">
-                                            <img src={item.product_image} alt={item.product.title} />
+                                                <img className='cart-img' src={item.product_image} alt={item.product.title} />
                                             </div>
                                             <div className="item-details">
                                                 <h3>{item.product.title}</h3>
@@ -103,15 +100,14 @@ const CartList = () => {
                             <motion.div className="cart-summary" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                                 <h3>Order Summary</h3>
                                 <div className="summary-row">
-                                    <span>Subtotal ({cartItems.length} items)</span>
+                                    <span className='sub-name'>Subtotal ({cartItems.length} items)</span>
                                     <span>{calculateTotal()}</span>
                                 </div>
                                 <button 
-    className="checkout-button" 
-    onClick={() => navigate('/payments', { state: { totalAmount: calculateTotal() } })}
->
-    Proceed to Checkout
-</button>
+                                    className="checkout-button" 
+                                    onClick={() => navigate('/payments', { state: { totalAmount: calculateTotal() } })}>
+                                    To Checkout
+                                </button>
 
                             </motion.div>
                         </>

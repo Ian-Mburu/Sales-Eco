@@ -1,15 +1,20 @@
 /* Cart Container */
 .cart-container {
-    max-width: 800px;
-    margin: 100px 0 0 250px;
-    padding: 0 1rem;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 50px;
+    margin-left: 400px;
 }
 
 .cart-header {
     text-align: center;
-    font-size: 2.5rem;
+    font-size: 29px;
     margin-bottom: 2rem;
-    color: #2d3436;
+    margin: 100px 0 0 0;
+    color: #ffffff;
 }
 
 /* Cart Items */
@@ -25,7 +30,7 @@
     align-items: center;
     gap: 1.5rem;
     padding: 1.5rem;
-    background: white;
+    background: rgba(255, 3, 3, 0.753);
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     transition: all 0.3s ease;
@@ -36,6 +41,12 @@
     height: 80px;
     object-fit: cover;
     border-radius: 8px;
+}
+
+.item-details {
+    display: flex;
+    flex-direction: column;
+    margin-left: 70px;
 }
 
 .item-details h3 {
@@ -50,7 +61,7 @@
 }
 
 .price-prd {
-    color: #0873c4;
+    color: #a1c7e4;
 }
 
 /* Quantity Controls */
@@ -64,13 +75,13 @@
     padding: 0.5rem;
     border: none;
     border-radius: 6px;
-    background: #f8f9fa;
+    background: #000000;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .quantity-controls button:hover {
-    background: #e9ecef;
+    background: #1e1e1f;
 }
 
 .quantity-controls button:disabled {
@@ -89,19 +100,20 @@
 .remove-button {
     background: none;
     border: none;
-    color: #ff7675;
+    color: #f0d8d8;
     cursor: pointer;
     padding: 0.5rem;
     transition: all 0.2s ease;
 }
 
 .remove-button:hover {
-    color: #d63031;
+    color: #ffffff;
+    background: none;
 }
 
 /* Cart Summary */
 .cart-summary {
-    background: white;
+    background: rgba(255, 3, 3, 0.753);
     padding: 2rem;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
@@ -115,13 +127,14 @@
 }
 
 .checkout-button {
-    width: 100%;
-    padding: 1rem;
-    background: #0984e3;
-    color: white;
+    width: 50%;
+    padding: 8px;
+    background: #ffffff;
+    color: rgb(0, 0, 0);
     border: none;
-    border-radius: 8px;
-    font-size: 1.1rem;
+    border-radius: 3px;
+    font-size: 16px;
+    font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -165,6 +178,13 @@
     animation: spin 1s linear infinite;
 }
 
+.item-image {
+    width: 170px;
+    height: auto;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -195,7 +215,7 @@
 }
 
 .item-total {
-    color: #0984e3;
+    color: #d5edff;
     font-weight: 500;
     margin: 0.5rem 0;
 }
@@ -219,3 +239,7 @@
     color: #2d3436;
     font-size: 1.2rem;
   }
+
+.sub-name {
+    color: #000000;
+}
