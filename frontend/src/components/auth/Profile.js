@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { getUserProfile } from '../../slices/profileSlice';
 import Header from '../Footer-Header/Header';
 import Footer from '../Footer-Header/Footer';
-import MessageButton from '../pages/MessageButton';
-import Notification from '../pages/Notification';
+import MessageButton from '../Messages/MessageButton';
+import Notification from '../Messages/Notification';
 import '../../styles/auth/profile.css';
 
 const Profile = () => {

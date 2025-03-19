@@ -2,22 +2,23 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import API from '../services/api';
 
+// Fetch all products
 export const getProducts = createAsyncThunk(
   'products/getAll',
   async (_, { rejectWithValue }) => {
     try {
       const response = await API.get('/products/');
-      // Ensure the response data is an array
       if (!Array.isArray(response.data)) {
         throw new Error('Expected an array of products');
       }
-      return response.data; // This should be an array
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
 
+// Fetch single product details
 export const getProductDetail = createAsyncThunk(
   'products/getDetail',
   async (productId, { rejectWithValue }) => {
@@ -25,23 +26,28 @@ export const getProductDetail = createAsyncThunk(
       const response = await API.get(`/products/${productId}/`);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
 
+// Add product to cart
 export const addToCart = createAsyncThunk(
   'products/addToCart',
   async ({ productId, quantity }, { rejectWithValue }) => {
     try {
-      const response = await API.post('/cart/add/', { product_id: productId, quantity });
-      return response.data;
+      const response = await API.post('/cart/add/', { 
+        product_id: productId, 
+        quantity 
+      });
+      return { productId, ...response.data };
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
 
+// Like/unlike product
 export const likeProduct = createAsyncThunk(
   'products/like',
   async (productId, { rejectWithValue }) => {
@@ -49,19 +55,20 @@ export const likeProduct = createAsyncThunk(
       const response = await API.post(`/products/${productId}/like/`);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
 
+// Add product to wishlist
 export const addToWishlist = createAsyncThunk(
-  'products/wishlist',
+  'products/addToWishlist',
   async (productId, { rejectWithValue }) => {
     try {
       const response = await API.post(`/wishlist/add/${productId}/`);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
@@ -71,83 +78,112 @@ const productsSlice = createSlice({
   initialState: {
     products: [],
     productDetail: null,
-    productsStatus: 'idle',
-    productDetailStatus: 'idle',
+    status: {
+      products: 'idle',
+      detail: 'idle',
+      cart: 'idle',
+      like: 'idle',
+      wishlist: 'idle'
+    },
     error: null,
-    cartStatus: 'idle',
-    likeStatus: 'idle',
-    wishlistStatus: 'idle',
     currentProductId: null
   },
-  reducers: {},
+  reducers: {
+    clearError: (state) => {
+      state.error = null;
+    }
+  },
   extraReducers: (builder) => {
     builder
       // Get Products
       .addCase(getProducts.pending, (state) => {
-        state.productsStatus = 'loading';
+        state.status.products = 'loading';
       })
       .addCase(getProducts.fulfilled, (state, action) => {
-        state.productsStatus = 'succeeded';
+        state.status.products = 'succeeded';
         state.products = action.payload;
       })
       .addCase(getProducts.rejected, (state, action) => {
-        state.productsStatus = 'failed';
+        state.status.products = 'failed';
         state.error = action.payload;
       })
-      
+
+      // Get Product Detail
+      .addCase(getProductDetail.pending, (state) => {
+        state.status.detail = 'loading';
+      })
+      .addCase(getProductDetail.fulfilled, (state, action) => {
+        state.status.detail = 'succeeded';
+        state.productDetail = action.payload;
+      })
+      .addCase(getProductDetail.rejected, (state, action) => {
+        state.status.detail = 'failed';
+        state.error = action.payload;
+      })
+
       // Add to Cart
       .addCase(addToCart.pending, (state, action) => {
-        state.cartStatus = 'loading';
+        state.status.cart = 'loading';
         state.currentProductId = action.meta.arg.productId;
       })
-      .addCase(addToCart.fulfilled, (state) => {
-        state.cartStatus = 'succeeded';
+      .addCase(addToCart.fulfilled, (state, action) => {
+        state.status.cart = 'succeeded';
+        const index = state.products.findIndex(p => p.id === action.payload.product.id);
+        if (index !== -1) {
+          state.products[index].is_in_cart = true;
+        }
         state.currentProductId = null;
       })
       .addCase(addToCart.rejected, (state, action) => {
-        state.cartStatus = 'failed';
+        state.status.cart = 'failed';
         state.currentProductId = null;
-        state.error = action.payload;
+        state.error = action.payload?.detail || action.payload?.message || "Failed to add to cart";
       })
-      
+
       // Like Product
       .addCase(likeProduct.pending, (state, action) => {
-        state.likeStatus = 'loading';
+        state.status.like = 'loading';
         state.currentProductId = action.meta.arg;
       })
       .addCase(likeProduct.fulfilled, (state, action) => {
-        state.likeStatus = 'succeeded';
-        const index = state.products.findIndex(p => p.id === action.payload.id);
-        if (index >= 0) {
-          state.products[index] = action.payload;
+        state.status.like = 'succeeded';
+        const updatedProduct = action.payload;
+        const index = state.products.findIndex(p => p.id === updatedProduct.id);
+        if (index !== -1) {
+          state.products[index] = {
+            ...state.products[index], // Keep existing properties
+            has_liked: updatedProduct.has_liked, // Update like status
+            likes_count: updatedProduct.likes_count // Update like count
+          };
         }
         state.currentProductId = null;
       })
       .addCase(likeProduct.rejected, (state, action) => {
-        state.likeStatus = 'failed';
+        state.status.like = 'failed';
         state.currentProductId = null;
-        state.error = action.payload;
+        state.error = action.payload?.detail || action.payload?.message || "Failed to like product";
       })
-      
-      // Wishlist
+
+      // Add to Wishlist
       .addCase(addToWishlist.pending, (state, action) => {
-        state.wishlistStatus = 'loading';
+        state.status.wishlist = 'loading';
         state.currentProductId = action.meta.arg;
       })
       .addCase(addToWishlist.fulfilled, (state, action) => {
-        state.wishlistStatus = 'succeeded';
-        const index = state.products.findIndex(p => p.id === action.payload.id);
-        if (index >= 0) {
-          state.products[index] = action.payload;
+        state.status.wishlist = 'succeeded';
+        const index = state.products.findIndex(p => p.id === action.payload.product.id);
+        if (index !== -1) {
+          state.products[index].is_in_wishlist = true;
         }
         state.currentProductId = null;
       })
       .addCase(addToWishlist.rejected, (state, action) => {
-        state.wishlistStatus = 'failed';
+        state.status.wishlist = 'failed';
         state.currentProductId = null;
-        state.error = action.payload;
+        state.error = action.payload?.detail || action.payload?.message || "Failed to add to wishlist";
       });
   }
 });
 
+export const { clearError } = productsSlice.actions;
 export default productsSlice.reducer;

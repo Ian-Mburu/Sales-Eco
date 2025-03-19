@@ -14,11 +14,12 @@ import OrderDetail from './components/pages/OrderDetail';
 import OrderList from './components/pages/OrderList';
 import PaymentList from'./components/pages/PaymentList';
 import Wishlist from './components/pages/Wishlist';
-import ContactForm from './components/pages/ContactForm';
+import ContactForm from './components/Messages/ContactForm';
 import ReviewList from './components/pages/ReviewList';
 import PaymentSuccess from './components/pages/PaymentSuccess';
-import MessageButton from './components/pages/MessageButton';
-import Notification from './components/pages/Notification';
+import MessageButton from './components/Messages/MessageButton';
+import Notification from './components/Messages/Notification';
+import MessageRoom from './components/Messages/MessageRoom';
 import PublicProfile from './components/auth/PublicProfile';
 
 
@@ -48,6 +49,7 @@ const App = () => {
         <Route path="/contact" element={<ContactForm />} />
         <Route path="/reviews" element={<ReviewList />} />
         <Route path="/message" element={<MessageButton />} />
+        <Route path="/messages/:threadId" element={<MessageRoom />} />
         <Route path="/notification" element={<Notification />} />
       </Routes>
     </Router>

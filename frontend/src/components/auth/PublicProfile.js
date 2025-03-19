@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { getPublicProfile } from '../../slices/PublicProfileSlice';
-import MessageButton from '../pages/MessageButton';
+import MessageButton from '../Messages/MessageButton';
 import '../../styles/auth/profile.css';
 
 const PublicProfile = () => {

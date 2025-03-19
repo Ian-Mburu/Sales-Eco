@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { sendMessage } from '../../slices/MessageSlice';
+import { useNavigate } from 'react-router-dom';
 import '../../styles/pages/message.css';
 
 const MessageButton = ({ seller }) => {
@@ -9,6 +10,8 @@ const MessageButton = ({ seller }) => {
   const [status, setStatus] = useState('idle');
   const dispatch = useDispatch();
   const { user } = useSelector(state => state.auth);
+  const navigate = useNavigate();
+
 
   const handleSendMessage = async () => {
     if (!messageContent.trim() || !user || !seller) return;
@@ -26,6 +29,13 @@ const MessageButton = ({ seller }) => {
     } catch (error) {
       setStatus('error');
     }
+  };
+
+
+  const handleMessageClick = () => {
+    const participants = [user.id, seller.id].sort();
+    const threadId = `thread_${participants.join('_')}`;
+    navigate(`/messages/${threadId}`);
   };
 
   if (!seller?.user?.id) return null;
@@ -54,6 +64,10 @@ const MessageButton = ({ seller }) => {
       
       {status === 'error' && 
         <div className="error-message">Failed to send message</div>}
+
+    <button onClick={handleMessageClick} className="message-button">
+      Message {seller.username}
+    </button>
     </div>
   );
 };

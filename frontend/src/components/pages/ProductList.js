@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { 
@@ -13,9 +13,12 @@ import { IoMdHeartEmpty, IoMdHeart } from "react-icons/io";
 import { FaHeart, FaRegHeart, FaShoppingCart } from "react-icons/fa";
 import CategoriesList from '../../components/pages/CategoriesList';
 import Loader from '../../components/Loader/Loader';
-import { fetchWishlist, addToWishlist } from '../../slices/WishlistSlice';
+import { addToWishlist } from '../../slices/WishlistSlice';
 
 const ProductList = () => {
+  const [feedback, setFeedback] = useState(null);
+  // const { wishlistItems } = useSelector((state) => state.wishlist);
+
   const dispatch = useDispatch();
   const { 
   products = [], // Default to an empty array if undefined
@@ -31,32 +34,80 @@ const ProductList = () => {
     dispatch(getProducts());
   }, [dispatch]);
 
-  // Add this validation
+  // Clear feedback messages after 3 seconds
+  useEffect(() => {
+    if (feedback) {
+      const timer = setTimeout(() => setFeedback(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [feedback]);
+
+  useEffect(() => {
+    console.log('Products updated:', products);
+  }, [products]);
+
+  const handleCart = async (productId, e) => {
+    e.preventDefault();
+    const product = products.find(p => p.id === productId);
+    if (product.is_in_cart) {
+      setFeedback({ type: 'error', message: 'Already in cart!' });
+      return;
+    }
+    try {
+      await dispatch(addToCart({ productId, quantity: 1 })).unwrap();
+      setFeedback({ type: 'success', message: 'Added to cart!' });
+    } catch (error) {
+      setFeedback({ type: 'error', message: 'Failed to add to cart' });
+    }
+  };
+
+
+  // Handle like action
+  const handleLike = async (productId, e) => {
+    e.preventDefault();
+    try {
+      // Immediate UI update
+      const productIndex = products.findIndex(p => p.id === productId);
+      const updatedProducts = [...products];
+      const currentLikeStatus = updatedProducts[productIndex].has_liked;
+      const currentLikes = updatedProducts[productIndex].likes_count;
+      
+      // Optimistic update
+      updatedProducts[productIndex] = {
+        ...updatedProducts[productIndex],
+        has_liked: !currentLikeStatus,
+        likes_count: currentLikeStatus ? currentLikes - 1 : currentLikes + 1
+      };
+      dispatch({ type: 'products/getAll/fulfilled', payload: updatedProducts });
+
+      // Dispatch actual API call
+      await dispatch(likeProduct(productId)).unwrap();
+    } catch (error) {
+      // Rollback on error
+      dispatch(getProducts());
+      setFeedback({ 
+        type: 'error', 
+        message: error.detail || error.message || 'Failed to update like' 
+      });
+    }
+  };
+
+
+  // Handle add to wishlist action
+  const handleWishlist = async (productId, e) => {
+    e.preventDefault();
+    try {
+      await dispatch(addToWishlist(productId)).unwrap();
+      setFeedback({ type: 'success', message: 'Added to wishlist!' });
+    } catch (error) {
+      setFeedback({ type: 'error', message: error });
+    }
+  };
+
+    // Add this validation
 if (!Array.isArray(products)) {
   return <div className="text-center py-8">Invalid products data format</div>;
 }
-
-  const handleCart = (productId, e) => {
-    e.preventDefault();
-    dispatch(addToCart({ productId, quantity: 1 }));
-  };
-
-  const handleLike = (productId, e) => {
-    e.preventDefault();
-    dispatch(likeProduct(productId));
-  };
-
-  const handleWishlist = (productId, e) => {
-    e.preventDefault();
-    dispatch(addToWishlist(productId))
-      .unwrap()
-      .then(() => {
-        dispatch(fetchWishlist());  // Refresh wishlist after adding
-      })
-      .catch((error) => {
-        console.error("Wishlist error:", error);
-      });
-  };
 
   if (productsStatus === 'loading') return <div className="text-center py-8"><Loader /></div>;
   if (error) return <div className="text-red-500 text-center py-8">Error: {error}</div>;
@@ -68,6 +119,13 @@ if (!Array.isArray(products)) {
       <div className='categories-prd'>
         <CategoriesList />
       </div>
+
+      {/* Feedback messages */}
+      {feedback && (
+        <div className={`feedback-message ${feedback.type}`}>
+          {feedback.message}
+        </div>
+      )}
       
       <div className="prd-list">
         {products.map(product => (
@@ -82,6 +140,7 @@ if (!Array.isArray(products)) {
                   <img src={product.seller.image} alt={product.seller.username} className="seller-img" />
                   <p className='seller-username'>{product.seller.username}</p>
                 </Link>
+                
                 <button 
                   className='add-cart' 
                   onClick={(e) => handleCart(product.id, e)}
@@ -108,18 +167,20 @@ if (!Array.isArray(products)) {
               
               <div className='date-prd'>
                 <div className='likes'>
-                  <button 
-                    onClick={(e) => handleLike(product.id, e)}
-                    disabled={likeStatus === 'loading' && currentProductId === product.id}
-                    className='add-like'
-                  >
-                    {product.has_liked ? (
-                      <IoMdHeart className="like-icon" />
-                    ) : (
-                      <IoMdHeartEmpty className="like-icon" />
-                    )}
-                  </button>
-                  <p className="likes-prd">{product.likes_count}</p>
+                <button 
+        onClick={(e) => handleLike(product.id, e)}
+        disabled={likeStatus === 'loading' && currentProductId === product.id}
+        className='add-like'
+      >
+        {product.has_liked ? (
+          <IoMdHeart className="like-icon text-red-500 animate-pulse" />
+        ) : (
+          <IoMdHeartEmpty className="like-icon hover:text-red-300" />
+        )}
+      </button>
+      <p className="likes-prd transition-all duration-300">
+        {product.likes_count}
+      </p>
                 </div>
                 
                 <button 
