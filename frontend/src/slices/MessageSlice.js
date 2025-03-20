@@ -56,12 +56,15 @@ const messageSlice = createSlice({
         // Store thread in threads object
         state.threads[action.payload.id] = action.payload.messages;
       })
-      .addCase(getMessageThread.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload;
-      })
       .addCase(sendMessage.fulfilled, (state, action) => {
         const { threadId, message } = action.payload;
+        console.log('Received message response:', action.payload);
+        
+        if (!threadId || !message) {
+          console.error('Invalid message response structure');
+          return;
+        }
+        
         if (!state.threads[threadId]) {
           state.threads[threadId] = [];
         }

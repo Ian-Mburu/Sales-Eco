@@ -4,8 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { getUserProfile } from '../../slices/profileSlice';
 import Header from '../Footer-Header/Header';
 import Footer from '../Footer-Header/Footer';
-import MessageButton from '../Messages/MessageButton';
-import Notification from '../Messages/Notification';
+// import { Link } from 'react-router-dom';
+// import MessageButton from '../Messages/MessageButton';
+// import Notification from '../Messages/Notification';
 import '../../styles/auth/profile.css';
 
 const Profile = () => {
@@ -22,6 +23,11 @@ const Profile = () => {
       navigate('/my-profile'); // Redirect to login if profile is not retrievable
     }
   }, [error, navigate]);
+
+  // user messages
+  const handleNavigate = () => {
+    navigate('/message', { state: { user: profile } }); 
+  };
 
 
   if (status === 'loading') return (
@@ -69,8 +75,10 @@ const Profile = () => {
               <p><strong>Last Login:</strong> {new Date(profile.last_login).toLocaleString()}</p>
               <button className="security-btn">Change Password</button>
             </div>
-            <Notification />
-            <MessageButton seller={profile} />
+            
+            <button onClick={handleNavigate}>
+              My messages
+            </button>
           </div>
         )}
       </div>
