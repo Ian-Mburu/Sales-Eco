@@ -12,17 +12,18 @@ import '../../styles/auth/profile.css';
 const Profile = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { profile, status, error } = useSelector((state) => state.profile);
+  const { profile, status, error, lastUpdated } = useSelector((state) => state.profile);
 
   useEffect(() => {
     dispatch(getUserProfile());
-  }, [dispatch]);
+  }, [dispatch, lastUpdated]);
 
   useEffect(() => {
     if (error) {
-      navigate('/my-profile'); // Redirect to login if profile is not retrievable
+      navigate('/my-profile'); 
     }
   }, [error, navigate]);
+
 
   // user messages
   const handleNavigate = () => {
@@ -44,21 +45,24 @@ const Profile = () => {
 
   if (status === 'loading') return <div className="loading-message">Loading profile...</div>;
 
-  return (                                                                                                                                                    
+  return (
     <>
       <Header />
-      <div className="profile-completion">
-  <div className="completion-bar" style={{ width: `$                                                                                                                                                                                                                                                                                  {profile.completion_percent}%` }}></div>
-  <p>Profile {profile.completion_percent}% Complete</p>
-</div>
+      
       <div className="profile-container">
         {profile && (
 
-          
-          
           <div className="profile-card">
             <div className="profile-header">
-              <img src={profile.image} alt={profile.username} className="profile-img" />
+            <img 
+  src={`${profile.image}?last_update=${profile.updated_at}`}
+  alt={profile.username}
+  className="profile-img"
+  onError={(e) => {
+    e.target.onerror = null;
+    e.target.src = '/default-avatar.png';
+  }}
+/>
               <div className="profile-info">
                 <h1>{profile.full_name}</h1>
                 <p>@{profile.username}</p>
@@ -105,38 +109,17 @@ const Profile = () => {
   <h3>Security</h3>
   <div className="security-grid">
     <div className="security-item">
-      <p><strong>Last Login:</strong> {new Date(profile.last_login).toLocaleString()}</p>
       <button className="security-btn" onClick={() => navigate('/change-password')}>
         Change Password
       </button>
     </div>
     <div className="security-item">
-      <p><strong>Email Verified:</strong> {profile.email_verified ? 'Yes' : 'No'}</p>
-      <button className="security-btn" onClick={() => navigate('/verify-email')}>
-        {profile.email_verified ? 'Update Email' : 'Verify Email'}
-      </button>
+      
     </div>
   </div>
 </div>
 
-            <div className="user-products">
-  <h3>My Listings ({profile.total_listings})</h3>
-  <div className="products-grid">
-    {profile.recent_products?.map(product => (
-      <div key={product.id} className="product-card">
-        <img src={product.image} alt={product.title} />
-        <div className="product-info">
-          <h4>{product.title}</h4>
-          <p>${product.price}</p>
-          <div className="product-stats">
-            <span><i className="fas fa-eye"></i> {product.views}</span>
-            <span><i className="fas fa-heart"></i> {product.likes_count}</span>
-          </div>
-        </div>
-      </div>
-    ))}
-  </div>
-</div>
+            
             
             <button onClick={handleNavigate}>
               My messages
