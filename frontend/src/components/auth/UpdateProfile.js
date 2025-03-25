@@ -54,6 +54,8 @@ const UpdateProfile = () => {
 
     try {
       await dispatch(updateUserProfile(formPayload)).unwrap();
+      // Wait for profile refresh before navigating
+      await new Promise(resolve => setTimeout(resolve, 500));
       navigate('/my-profile');
     } catch (error) {
       console.error('Update failed:', error);

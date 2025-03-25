@@ -73,7 +73,15 @@ const profileSlice = createSlice({
       .addCase(updateUserProfile.pending, (state) => {
         state.status = 'updating';
       })
-      .addCase(updateUserProfile.fulfilled, (state) => {
+      .addCase(updateUserProfile.fulfilled, (state, action) => {
+        // Merge updated fields immediately
+        state.profile = {
+        ...state.profile,
+        ...action.payload,
+        image: action.payload.image ? 
+        `${action.payload.image}?v=${Date.now()}` : 
+        state.profile.image
+        };
         state.status = 'succeeded';
       })
       .addCase(updateUserProfile.rejected, (state, action) => {
