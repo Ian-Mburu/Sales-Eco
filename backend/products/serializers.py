@@ -2,6 +2,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer # typ
 from rest_framework import serializers # type: ignore
 from django.contrib.auth.password_validation import validate_password
 from . import models as products_models
+from django.db.models import Avg, Count
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -63,14 +64,27 @@ class PublicProfileSerializer(serializers.ModelSerializer):
     join_date = serializers.DateTimeField(source='user.date_joined')
     email = serializers.EmailField(source='user.email')
     full_name = serializers.CharField(source='user.full_name')
+    average_rating = serializers.SerializerMethodField()
+    total_reviews = serializers.SerializerMethodField()
+    recent_products = serializers.SerializerMethodField()
 
     class Meta:
         model = products_models.Profile
         fields = [
             'username', 'email', 'full_name', 'image', 
             'bio', 'county', 'facebook', 'twitter', 
-            'date', 'join_date'
+            'date', 'join_date', 'average_rating', 'total_reviews', 'recent_products'
         ]
+        
+    def get_average_rating(self, obj):
+        return obj.user.products.aggregate(Avg('reviews__rating'))['reviews__rating__avg'] or 0
+
+    def get_total_reviews(self, obj):
+        return obj.user.products.aggregate(Count('reviews'))['reviews__count']
+
+    def get_recent_products(self, obj):
+        products = obj.user.products.order_by('-date')[:3]
+        return ProductSerializer(products, many=True, context=self.context).data
 
 class CategorySerializer(serializers.ModelSerializer):
     post_count = serializers.SerializerMethodField()

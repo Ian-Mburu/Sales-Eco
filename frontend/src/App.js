@@ -21,6 +21,7 @@ import MessageButton from './components/Messages/MessageButton';
 import Notification from './components/Messages/Notification';
 import MessageRoom from './components/Messages/MessageRoom';
 import PublicProfile from './components/auth/PublicProfile';
+import UpdateProfile from './components/auth/UpdateProfile';
 
 
 const App = () => {
@@ -39,6 +40,12 @@ const App = () => {
           <Route path="/cart" element={
             <ProtectedRoute>
               <Cart />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/update-profile" element={
+            <ProtectedRoute>
+              <UpdateProfile />
             </ProtectedRoute>
           } />
         <Route path="/orders" element={<OrderList />} />

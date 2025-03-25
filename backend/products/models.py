@@ -41,6 +41,8 @@ class Profile(models.Model):
     facebook = models.URLField(null=True, blank=True)
     twitter = models.URLField(null=True, blank=True)
     date = models.DateTimeField(auto_now_add=True)
+    email_verified = models.BooleanField(default=False)
+    completion_percent = models.IntegerField(default=0)
 
     def __str__(self):
         return self.user.username
@@ -51,6 +53,11 @@ class Profile(models.Model):
 
         super(Profile, self).save(*args, **kwargs)
 
+    def update_completion(self):
+        fields = ['image', 'bio', 'county', 'facebook', 'twitter']
+        completed = sum(1 for field in fields if getattr(self, field))
+        self.completion_percent = int((completed / len(fields)) * 100)
+        self.save()
 
 def create_profile(sender, instance, created, **kwargs):
         if created:
