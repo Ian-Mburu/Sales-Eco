@@ -52,12 +52,27 @@ class ProfileSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source='user.email')
     full_name = serializers.CharField(source='user.full_name')
 
+    bio = serializers.CharField(required=False, allow_blank=True)
+    county = serializers.CharField(required=False, allow_blank=True)
+    facebook = serializers.URLField(required=False, allow_blank=True)
+    twitter = serializers.URLField(required=False, allow_blank=True)
+
     class Meta:
         model = products_models.Profile
         fields = [
             'username', 'email', 'full_name', 'image', 
             'bio', 'county', 'facebook', 'twitter', 'date'
         ]
+
+    def update(self, instance, validated_data):
+        # Explicitly handle empty values
+        for attr, value in validated_data.items():
+            if value == '':  # Treat empty strings as null
+                setattr(instance, attr, None)
+            else:
+                setattr(instance, attr, value)
+        instance.save()
+        return instance
 
 class PublicProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username')

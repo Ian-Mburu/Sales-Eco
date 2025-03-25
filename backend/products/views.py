@@ -49,6 +49,11 @@ class ProfileView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user.profile
+    
+    def finalize_response(self, request, response, *args, **kwargs):
+        response = super().finalize_response(request, response, *args, **kwargs)
+        response['Cache-Control'] = 'no-store, max-age=0'
+        return response
 
 class PublicProfileView(generics.RetrieveAPIView):
     serializer_class = products_serializer.PublicProfileSerializer
