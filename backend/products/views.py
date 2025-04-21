@@ -32,16 +32,10 @@ class MyTokenObtainPairView(TokenObtainPairView):
 class RegisterView(generics.CreateAPIView):
     queryset = products_models.User.objects.all()
     serializer_class = products_serializer.RegisterSerializer
-    permission_classes = [AllowAny,]
+    permission_classes = [IsAuthenticated,]
 
     def create(self, request, *args, **kwargs):
-        print("Received Data:", request.data)  # Debugging
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            return Response({"message": "User registered successfully"}, status=status.HTTP_201_CREATED)
-        print("Errors:", serializer.errors)  # Debugging
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        from rest_framework.decorators import APIView# type: ignore
 
 class ProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = products_serializer.ProfileSerializer
